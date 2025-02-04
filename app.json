@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "gsecurity",
+    "slug": "g-security",
+    "newArchEnabled": true,
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/gitam-logo-circle.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/gitam-logo-circle.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
+        "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone."
+      }
+    },
+    "android": {
+      "googleServicesFile": "./google-services.json",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/gitam-logo-circle.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.gitamCats.edu"
+    },
+    "web": {
+      "favicon": "./assets/gitam-logo-circle.png"
+    },
+    "plugins": [
+      "expo-font",
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
+          "enableMicrophonePermission": true,
+          "microphonePermissionText": "$(PRODUCT_NAME) needs access to your Microphone.",
+          "enableCodeScanner": true
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "9adc7d3d-e156-495f-90af-86304d7a50b9"
+      }
+    },
+    "owner": "gitamcats"
+  }
+}
