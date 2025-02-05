@@ -1,13 +1,24 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Text, Image, HStack, VStack, Badge, View } from "native-base";
 import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { MaterialIcons } from "@expo/vector-icons";
+import { fetchLeaves } from "../../../store/slices/homeSlice";
 export default function ViolationsCard() {
-  const { cardData, image, noProfile, profile } = useSelector(
+  const dispatch = useDispatch();
+  const { cardData, image, noProfile, profile, leaves } = useSelector(
     (state) => state.home
   );
+  console.log("profile: ", profile.token);
+  // useEffect(() => {
+  //   if (
+  //     profile?.role === "student" &&
+  //     profile?.stdprofile[0]?.hostler === "Y"
+  //   ) {
+  //     dispatch(fetchLeaves(profile?.stdprofile[0]?.regdno, profile.token));
+  //   }
+  // }, [profile, dispatch]);
   const navigation = useNavigation();
   const handleShowViolations = () => {
     navigation.navigate("AddViolations");
@@ -92,7 +103,7 @@ export default function ViolationsCard() {
   const LeavesPermissionsStack = ({ handleCheckIn, handleCheckOut }) => (
     <Box bg="#F5F5F5" borderRadius="xl" padding="4" marginTop="4">
       <Text fontSize="lg" fontWeight="bold" color="#007367" marginBottom="4">
-        Leaves & Permissions ({cardData?.length || 0})
+        Leaves & Permissions ({leaves?.length || 0})
       </Text>
       <HStack justifyContent="space-between" space={4}>
         <CustomButton

@@ -18,6 +18,7 @@ export default function Communication({ navigation }) {
   const formatTime = (time) => {
     if (!time) return "N/A";
     const date = new Date(time);
+    if (isNaN(date.getTime())) return "Invalid Time";
     let hours = date.getHours();
     let minutes = date.getMinutes();
     const ampm = hours >= 12 ? "PM" : "AM";
@@ -50,7 +51,9 @@ export default function Communication({ navigation }) {
             setMessages((prevMessages) =>
               prevMessages.map((msg) => ({
                 ...msg,
-                sender: parsedUser,
+                time: msg.time
+                  ? new Date(msg.time).toISOString()
+                  : new Date().toISOString(),
               }))
             );
           }
@@ -64,14 +67,14 @@ export default function Communication({ navigation }) {
   }, [profile]);
   const handleSendMessage = useCallback(async () => {
     const date = new Date();
-    const time = formatTime(date);
+    const isoTime = date.toISOString();
     if (message.trim()) {
       const newMessage = {
         regdNo: profile?.stdprofile[0]?.regdno || "Unknown",
         mobile: profile?.stdprofile[0]?.mobile || "Unknown",
         username: profile?.stdprofile[0]?.name || "Anonymous",
         message: message,
-        time: time,
+        time: isoTime,
       };
       setMessages((prevMessages) => [...prevMessages, newMessage]);
       setMessage("");
@@ -120,6 +123,31 @@ export default function Communication({ navigation }) {
       }
     }
   }, [message, profile]);
+  const getMessageDateLabel = (messageTime) => {
+    if (!messageTime) return "Unknown";
+    const msgDate = new Date(messageTime);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+    today.setHours(0, 0, 0, 0);
+    yesterday.setHours(0, 0, 0, 0);
+    msgDate.setHours(0, 0, 0, 0);
+    if (msgDate.getTime() === today.getTime()) return "Today";
+    if (msgDate.getTime() === yesterday.getTime()) return "Yesterday";
+    return msgDate.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+  const groupedMessages = messages.reduce((acc, msg) => {
+    const dateLabel = getMessageDateLabel(msg.time);
+    if (!acc[dateLabel]) {
+      acc[dateLabel] = [];
+    }
+    acc[dateLabel].push(msg);
+    return acc;
+  }, {});
   return (
     <Box flex={1} backgroundColor="#fff">
       <Box backgroundColor="#007367" paddingY="10" paddingX="4" zIndex={1}>
@@ -144,29 +172,56 @@ export default function Communication({ navigation }) {
           </VStack>
         </HStack>
       </Box>
-      <ScrollView flex={1} marginTop={4} px={"4"} py="2">
-        {messages.map((msg, index) => (
-          <Box
-            key={index}
-            bg="#e6f6f6"
-            px="4"
-            py="2"
-            borderRadius="md"
-            marginY="1"
-          >
-            <HStack justifyContent="space-between">
-              <HStack space={2}>
-                <Text fontWeight="bold">{msg?.username || "Anonymous"}</Text>
-                <Text color="gray.500">+91 {msg?.mobile || "N/A"}</Text>
-              </HStack>
-            </HStack>
-            <Text mt="2" py={2} fontSize={"md"}>
-              {msg?.message}
-            </Text>
-            <Text color="gray.500" fontSize="xs" textAlign={"right"}>
-              {formatTime(msg.time)}
-            </Text>
-          </Box>
+      <ScrollView flex={1} px="4" py="2">
+        {Object.entries(groupedMessages).map(([dateLabel, msgs], index) => (
+          <React.Fragment key={index}>
+            <Box
+              alignSelf="center"
+              px="3"
+              py="0.5"
+              borderRadius="5"
+              borderWidth={1}
+              borderColor="rgba(0, 0, 0, 0.1)"
+              shadow={2}
+              bg={"#F8FAFC"}
+              mb={0.5}
+              mt={0.5}
+            >
+              <Text
+                color="black"
+                fontWeight="bold"
+                fontSize={14}
+                textAlign="center"
+              >
+                {dateLabel}
+              </Text>
+            </Box>
+            {msgs.map((msg, msgIndex) => (
+              <Box
+                key={msgIndex}
+                bg="#e6f6f6"
+                px="4"
+                py="2"
+                borderRadius="md"
+                marginY="1"
+              >
+                <HStack justifyContent="space-between">
+                  <HStack space={2}>
+                    <Text fontWeight="bold">
+                      {msg?.username || "Anonymous"}
+                    </Text>
+                    <Text color="gray.500">+91 {msg?.mobile || "N/A"}</Text>
+                  </HStack>
+                </HStack>
+                <Text mt="2" py={2} fontSize="md">
+                  {msg?.message}
+                </Text>
+                <Text color="gray.500" fontSize="xs" textAlign="right">
+                  {msg.time ? formatTime(msg.time) : "N/A"}
+                </Text>
+              </Box>
+            ))}
+          </React.Fragment>
         ))}
       </ScrollView>
       <HStack space={3} alignItems="center" padding={4}>
@@ -181,6 +236,9 @@ export default function Communication({ navigation }) {
           borderRadius="lg"
           p={"4"}
           fontSize={"md"}
+          multiline={true}
+          numberOfLines={4}
+          textAlignVertical="top"
         />
         <Pressable onPress={handleSendMessage}>
           <Ionicons name="send" size={26} color="#007367" />

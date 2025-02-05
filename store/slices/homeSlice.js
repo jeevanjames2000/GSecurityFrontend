@@ -57,6 +57,39 @@ export const fetchDataBySearchQuery = createAsyncThunk(
     return { source, data };
   }
 );
+export const fetchLeaves = createAsyncThunk(
+  "home/fetchLeaves",
+  async ({ regdNo, token }, { rejectWithValue }) => {
+    // console.log("regdNo, token: ", regdNo, token);
+    try {
+      const formBody = new URLSearchParams();
+      formBody.append("regdno", "2024107163");
+
+      const response = await fetch(
+        "https://studentmobileapi.gitam.edu/Gsecurity_permissionstatus",
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Authorization: `Bearer ${"eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiMjAyNDEwNzE2MyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlN0dWRlbnQiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjJiODkyNTdiLWVhYWUtNDRhYy04Mzg0LTYwN2I5NmQ2YzdkMCIsImlzcyI6Ind3dy5naXRhbS5lZHUiLCJhdWQiOiJ3d3cuZ2l0YW0uZWR1In0.QdM3h5_kykCJIUG5fRpQfGwBUi7i2JIjEN_XZfBBE80"}`,
+          },
+          body: formBody.toString(),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch leave permissions.");
+      }
+
+      const data = await response.json();
+      console.log("Leaves Data:", data);
+      return data;
+    } catch (error) {
+      console.error("Error fetching leaves:", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const initialState = {
   searchStore: "",
   profile: null,
@@ -67,6 +100,7 @@ const initialState = {
   image: "",
   noProfile: false,
   noCardData: false,
+  leaves: [],
 };
 const homeSlice = createSlice({
   name: "home",
@@ -122,6 +156,10 @@ const homeSlice = createSlice({
         state.noCardData = true;
         state.isLoading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchLeaves.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.leaves = action.payload;
       });
   },
 });
