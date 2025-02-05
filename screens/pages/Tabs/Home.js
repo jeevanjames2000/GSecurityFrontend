@@ -18,7 +18,7 @@ import SkeletonCard from "../SearchCards/skeletonCard";
 import ViolationsCard from "../SearchCards/violationCard";
 import VisitorDetailsCard from "../SearchCards/visitorsCard";
 import useSearch from "../../../hooks/useSearch";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 const featuredData = [
   {
     name: "CCTV",

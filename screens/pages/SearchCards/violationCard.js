@@ -2,23 +2,43 @@ import React, { useEffect, useState } from "react";
 import { Box, Text, Image, HStack, VStack, Badge, View } from "native-base";
 import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { MaterialIcons } from "@expo/vector-icons";
-import { fetchLeaves } from "../../../store/slices/homeSlice";
 export default function ViolationsCard() {
-  const dispatch = useDispatch();
-  const { cardData, image, noProfile, profile, leaves } = useSelector(
+  const { cardData, image, noProfile, profile } = useSelector(
     (state) => state.home
   );
-  console.log("profile: ", profile.token);
-  // useEffect(() => {
-  //   if (
-  //     profile?.role === "student" &&
-  //     profile?.stdprofile[0]?.hostler === "Y"
-  //   ) {
-  //     dispatch(fetchLeaves(profile?.stdprofile[0]?.regdno, profile.token));
-  //   }
-  // }, [profile, dispatch]);
+  const [leaves, setLeaves] = useState(null);
+  console.log("profile: ", profile, leaves);
+
+  const fetchLeavePermissions = async () => {
+    try {
+      const url = `https://studentmobileapi.gitam.edu/Gsecurity_permissionstatus?regdno=${profile.stdprofile[0].regdno}`;
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: `Bearer ${profile.token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch leave permissions.");
+      }
+
+      const data = await response.json();
+      setLeaves(data);
+    } catch (error) {}
+  };
+  useEffect(() => {
+    if (
+      profile?.stdprofile[0]?.hostler === "Y" &&
+      profile?.role === "student"
+    ) {
+      fetchLeavePermissions();
+    }
+  }, [profile.stdprofile, profile.token]);
+
   const navigation = useNavigation();
   const handleShowViolations = () => {
     navigation.navigate("AddViolations");
@@ -81,11 +101,7 @@ export default function ViolationsCard() {
       </Text>
     </Pressable>
   );
-  const ViolationsStack = ({
-    cardData,
-    handleShowViolations,
-    handleAddViolation,
-  }) => (
+  const ViolationsStack = ({ cardData }) => (
     <Box bg="#F5F5F5" borderRadius="xl" padding="4" marginTop="4">
       <Text fontSize="lg" fontWeight="bold" color="#007367" marginBottom="4">
         Violations ({cardData?.length || 0})
@@ -103,7 +119,7 @@ export default function ViolationsCard() {
   const LeavesPermissionsStack = ({ handleCheckIn, handleCheckOut }) => (
     <Box bg="#F5F5F5" borderRadius="xl" padding="4" marginTop="4">
       <Text fontSize="lg" fontWeight="bold" color="#007367" marginBottom="4">
-        Leaves & Permissions ({leaves?.length || 0})
+        Leaves & Permissions ({leaves?.getpermissionstatus?.length || 0})
       </Text>
       <HStack justifyContent="space-between" space={4}>
         <CustomButton
@@ -149,12 +165,22 @@ export default function ViolationsCard() {
             </Text>
             <Badge
               colorScheme={
-                profile?.stdprofile?.[0]?.status === "A" ? "success" : "error"
+                (profile?.role === "student" &&
+                  profile?.stdprofile?.[0]?.status === "S") ||
+                (profile?.role === "staff" &&
+                  profile?.stdprofile?.[0]?.status === "A")
+                  ? "success"
+                  : "error"
               }
               _text={{ fontSize: "md" }}
               borderRadius={5}
             >
-              {profile?.stdprofile?.[0]?.status === "A" ? "Active" : "Inactive"}
+              {(profile?.role === "student" &&
+                profile?.stdprofile?.[0]?.status === "S") ||
+              (profile?.role === "staff" &&
+                profile?.stdprofile?.[0]?.status === "A")
+                ? "Active"
+                : "Inactive"}
             </Badge>
           </HStack>
         </VStack>
@@ -192,7 +218,6 @@ export default function ViolationsCard() {
           </Box>
         ))}
       </VStack>
-      {}
       <ViolationsStack
         cardData={cardData}
         handleShowViolations={handleShowViolations}
