@@ -62,7 +62,6 @@ const emergencyData = [
 export default function Home() {
   const navigation = useNavigation();
   const {
-    search,
     setSearch,
     isSearchTriggered,
     handleSearch,
@@ -73,10 +72,13 @@ export default function Home() {
     profile: homeProfile,
   } = useSearch();
   const { profile } = useSelector((state) => state.profile);
-
+  const search = useSelector((state) => state.home.searchStore);
   const toast = useToast();
   useFocusEffect(
     useCallback(() => {
+      if (search) {
+        handleSearch();
+      }
       const onBackPress = () => {
         Alert.alert("Exit App", "Are you sure you want to exit?", [
           { text: "Cancel", style: "cancel" },
@@ -92,7 +94,6 @@ export default function Home() {
   const handleRoute = (item) => {
     navigation.navigate({ name: item.name });
   };
-
   const handleEmergencyRoute = (item) => {
     const phoneNumber = `tel:${item.phone}`;
     Linking.openURL(phoneNumber).catch((err) =>

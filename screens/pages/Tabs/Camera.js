@@ -18,7 +18,13 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import useSearch from "../../../hooks/useSearch";
+import { useDispatch } from "react-redux";
+import { searchState } from "../../../store/slices/homeSlice";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 export default function QrCamera() {
+  const navigation = useNavigation();
+  const { setSearch, handleSearch } = useSearch();
   const [isFlashOn, setIsFlashOn] = useState(false);
   const [cameraFacing, setCameraFacing] = useState("back");
   const device = useCameraDevice(cameraFacing);
@@ -96,33 +102,28 @@ export default function QrCamera() {
       const photo = await camera.current.takePhoto({
         flash: isFlashOn ? "on" : "off",
       });
-      console.log("photo path:", photo.path);
       CameraRoll.saveAsset(photo.path);
     }
   };
   const [scannedData, setScannedData] = useState(null);
+  const dispatch = useDispatch();
   const codeScanner = useCodeScanner({
-    codeTypes: [
-      "qr",
-      "ean-13",
-      "ean-8",
-      "upc-a",
-      "upc-e",
-      "code-128",
-      "code-39",
-      "code-93",
-      "codabar",
-      "aztec",
-      "data-matrix",
-    ],
+    codeTypes: ["qr", "ean-13", "ean-8", "upc-a"],
     onCodeScanned: (codes) => {
       if (codes.length > 0) {
-        codes.forEach((code, index) => {
+        codes.forEach((code) => {
+          dispatch(searchState(code.value));
           setScannedData(code.value);
+          navigation.navigate("Home");
         });
       }
     },
   });
+  useFocusEffect(
+    React.useCallback(() => {
+      setScannedData(null);
+    }, [])
+  );
   return (
     <View style={styles.container}>
       <Camera

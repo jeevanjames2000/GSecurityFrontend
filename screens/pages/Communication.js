@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
   Box,
   Text,
@@ -34,36 +34,38 @@ export default function Communication({ navigation }) {
       const data = await response.json();
       if (data.success) {
         setMessages(data.messages);
-      } else {
-        console.warn("No messages found.");
+      }
+    } catch (error) {}
+  };
+  const fetchUser = async () => {
+    try {
+      const storedUser = await AsyncStorage.getItem("authUser");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        if (!profile) {
+          setMessages((prevMessages) =>
+            prevMessages.map((msg) => ({
+              ...msg,
+              time: msg.time
+                ? new Date(msg.time).toISOString()
+                : new Date().toISOString(),
+            }))
+          );
+        }
       }
     } catch (error) {
-      console.error("Error fetching messages:", error);
+      console.error("Error fetching user from AsyncStorage:", error);
     }
   };
+  const scrollViewRef = useRef(null);
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const storedUser = await AsyncStorage.getItem("authUser");
-        if (storedUser) {
-          const parsedUser = JSON.parse(storedUser);
-          if (!profile) {
-            setMessages((prevMessages) =>
-              prevMessages.map((msg) => ({
-                ...msg,
-                time: msg.time
-                  ? new Date(msg.time).toISOString()
-                  : new Date().toISOString(),
-              }))
-            );
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching user from AsyncStorage:", error);
-      }
-    };
     fetchUser();
     fetchMessages();
+    setTimeout(() => {
+      if (scrollViewRef.current) {
+        scrollViewRef.current.scrollToEnd({ animated: true });
+      }
+    }, 500);
   }, [profile]);
   const handleSendMessage = useCallback(async () => {
     const date = new Date();
@@ -148,14 +150,58 @@ export default function Communication({ navigation }) {
     acc[dateLabel].push(msg);
     return acc;
   }, {});
+  function MessageItem({ msg }) {
+    const [expanded, setExpanded] = useState(false);
+    const isLongMessage = msg?.message.length > 100;
+    const displayText = expanded
+      ? msg?.message
+      : msg?.message.slice(0, 118) + (isLongMessage ? "..." : "");
+    return (
+      <Box bg="#e6f6f6" px="4" py="1" borderRadius="md" marginY="1">
+        <HStack justifyContent="space-between">
+          <HStack space={2}>
+            <Text fontWeight="bold">{msg?.username || "Anonymous"}</Text>
+            <Text color="gray.500">+91 {msg?.mobile || "N/A"}</Text>
+          </HStack>
+        </HStack>
+        <Text mt="2" fontSize="md">
+          {displayText}
+          {isLongMessage && !expanded && (
+            <Text
+              color="warning.500"
+              fontSize={14}
+              textAlign={"right"}
+              alignItems={"center"}
+              onPress={() => setExpanded(true)}
+            >
+              Read more
+            </Text>
+          )}
+          {expanded && (
+            <Text
+              color="blue.500"
+              fontSize="md"
+              textAlign={"center"}
+              onPress={() => setExpanded(false)}
+            >
+              Read less
+            </Text>
+          )}
+        </Text>
+        <Text color="gray.500" fontSize="xs" textAlign="right">
+          {msg.time ? formatTime(msg.time) : "N/A"}
+        </Text>
+      </Box>
+    );
+  }
   return (
     <Box flex={1} backgroundColor="#fff">
       <Box backgroundColor="#007367" paddingY="10" paddingX="4" zIndex={1}>
         <HStack
           alignItems="center"
           justifyContent="center"
-          top={10}
-          paddingBottom={"4"}
+          top={5}
+          paddingBottom={"0"}
         >
           <Pressable onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={26} color="white" />
@@ -172,14 +218,23 @@ export default function Communication({ navigation }) {
           </VStack>
         </HStack>
       </Box>
-      <ScrollView flex={1} px="4" py="2">
+      <ScrollView
+        ref={scrollViewRef}
+        flex={1}
+        px="4"
+        py="2"
+        mb={1}
+        onContentSizeChange={() =>
+          scrollViewRef.current.scrollToEnd({ animated: true })
+        }
+      >
         {Object.entries(groupedMessages).map(([dateLabel, msgs], index) => (
           <React.Fragment key={index}>
             <Box
               alignSelf="center"
               px="3"
               py="0.5"
-              borderRadius="5"
+              borderRadius="10"
               borderWidth={1}
               borderColor="rgba(0, 0, 0, 0.1)"
               shadow={2}
@@ -189,7 +244,7 @@ export default function Communication({ navigation }) {
             >
               <Text
                 color="black"
-                fontWeight="bold"
+                fontWeight="thin"
                 fontSize={14}
                 textAlign="center"
               >
@@ -197,44 +252,22 @@ export default function Communication({ navigation }) {
               </Text>
             </Box>
             {msgs.map((msg, msgIndex) => (
-              <Box
-                key={msgIndex}
-                bg="#e6f6f6"
-                px="4"
-                py="2"
-                borderRadius="md"
-                marginY="1"
-              >
-                <HStack justifyContent="space-between">
-                  <HStack space={2}>
-                    <Text fontWeight="bold">
-                      {msg?.username || "Anonymous"}
-                    </Text>
-                    <Text color="gray.500">+91 {msg?.mobile || "N/A"}</Text>
-                  </HStack>
-                </HStack>
-                <Text mt="2" py={2} fontSize="md">
-                  {msg?.message}
-                </Text>
-                <Text color="gray.500" fontSize="xs" textAlign="right">
-                  {msg.time ? formatTime(msg.time) : "N/A"}
-                </Text>
-              </Box>
+              <MessageItem key={msgIndex} msg={msg} />
             ))}
           </React.Fragment>
         ))}
       </ScrollView>
-      <HStack space={3} alignItems="center" padding={4}>
+      <HStack space={3} alignItems="center" padding={4} pt={2} pb={2}>
         <Input
           flex={1}
           placeholder="Type your message..."
           value={message}
           onChangeText={setMessage}
           variant="filled"
-          backgroundColor="white"
           borderColor={"black"}
+          bg={"#fff"}
           borderRadius="lg"
-          p={"4"}
+          p={"3"}
           fontSize={"md"}
           multiline={true}
           numberOfLines={4}

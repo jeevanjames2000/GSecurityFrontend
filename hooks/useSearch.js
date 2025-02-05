@@ -11,8 +11,10 @@ const useSearch = () => {
   const { isLoading, cardData, cardType, searchStore, profile } = useSelector(
     (state) => state.home
   );
-
-  const [search, setSearch] = useState("");
+  const search = useSelector((state) => state.home.searchStore);
+  const setSearch = (value) => {
+    dispatch(searchState(value));
+  };
   const [isSearchTriggered, setIsSearchTriggered] = useState(false);
   const handleSearch = async () => {
     dispatch(clearState());

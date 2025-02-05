@@ -3,14 +3,11 @@ import { Box, Text, Image, HStack, VStack, Badge, View } from "native-base";
 import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-import { MaterialIcons } from "@expo/vector-icons";
 export default function ViolationsCard() {
   const { cardData, image, noProfile, profile } = useSelector(
     (state) => state.home
   );
   const [leaves, setLeaves] = useState(null);
-  console.log("profile: ", profile, leaves);
-
   const fetchLeavePermissions = async () => {
     try {
       const url = `https://studentmobileapi.gitam.edu/Gsecurity_permissionstatus?regdno=${profile.stdprofile[0].regdno}`;
@@ -21,11 +18,9 @@ export default function ViolationsCard() {
           Authorization: `Bearer ${profile.token}`,
         },
       });
-
       if (!response.ok) {
         throw new Error("Failed to fetch leave permissions.");
       }
-
       const data = await response.json();
       setLeaves(data);
     } catch (error) {}
@@ -37,8 +32,7 @@ export default function ViolationsCard() {
     ) {
       fetchLeavePermissions();
     }
-  }, [profile.stdprofile, profile.token]);
-
+  }, [profile?.stdprofile[0], profile?.token]);
   const navigation = useNavigation();
   const handleShowViolations = () => {
     navigation.navigate("AddViolations");
@@ -70,25 +64,27 @@ export default function ViolationsCard() {
     bgColor,
     textColor,
     borderColor,
+    status,
   }) => (
     <Pressable
       onPress={onPress}
-      style={{
-        backgroundColor: bgColor,
-        borderWidth: borderColor ? 0.5 : 0,
-        borderColor: borderColor,
-        borderRadius: 20,
-        paddingVertical: 10,
-        alignItems: "center",
-        textAlign: "center",
-        justifyContent: "center",
-        flex: 1,
-        flexDirection: "row",
-        elevation: 3,
-      }}
-      _pressed={{ opacity: 0.8 }}
+      disabled={status}
+      style={({ pressed }) => [
+        {
+          backgroundColor: bgColor,
+          borderWidth: 0.5,
+          borderColor: borderColor,
+          borderRadius: 20,
+          paddingVertical: 10,
+          alignItems: "center",
+          justifyContent: "center",
+          flex: 1,
+          flexDirection: "row",
+          elevation: 3,
+          opacity: status ? 0.5 : pressed ? 0.8 : 1,
+        },
+      ]}
     >
-      <MaterialIcons name={iconName} size={20} color={textColor} />
       <Text
         style={{
           fontSize: 16,
@@ -124,11 +120,29 @@ export default function ViolationsCard() {
       <HStack justifyContent="space-between" space={4}>
         <CustomButton
           text="Check In"
-          bgColor="#fff"
-          textColor="#37474F"
+          bgColor={
+            leaves?.getpermissionstatus[0]?.isapprove === "I"
+              ? "#fff"
+              : "#007367"
+          }
+          textColor={
+            leaves?.getpermissionstatus[0]?.isapprove === "I" ? "black" : "#fff"
+          }
           borderColor="#37474F"
+          status={leaves?.getpermissionstatus[0]?.isapprove === "I"}
         />
-        <CustomButton text="Check Out" bgColor="#007367" textColor="#fff" />
+        <CustomButton
+          text="Check Out"
+          bgColor={
+            leaves?.getpermissionstatus[0]?.isapprove === "L"
+              ? "#fff"
+              : "#007367"
+          }
+          textColor={
+            leaves?.getpermissionstatus[0]?.isapprove === "L" ? "black" : "#fff"
+          }
+          status={leaves?.getpermissionstatus[0]?.isapprove === "L"}
+        />
       </HStack>
     </Box>
   );
@@ -222,9 +236,8 @@ export default function ViolationsCard() {
         cardData={cardData}
         handleShowViolations={handleShowViolations}
       />
-      {(profile?.role === "student" &&
-        profile?.stdprofile[0]?.hostler === "Y") ||
-        ("" && <LeavesPermissionsStack />)}
+      {profile?.role === "student" &&
+        profile?.stdprofile[0]?.hostler === "Y" && <LeavesPermissionsStack />}
     </Box>
   );
 }
