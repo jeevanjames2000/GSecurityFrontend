@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Box,
   Text,
@@ -73,13 +73,22 @@ export default function Home() {
   } = useSearch();
   const { profile } = useSelector((state) => state.profile);
   const search = useSelector((state) => state.home.searchStore);
-  console.log("search: ", search);
   const toast = useToast();
+  const [debouncedSearch, setDebouncedSearch] = useState(search);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 500);
+
+    return () => clearTimeout(handler);
+  }, [search]);
   useFocusEffect(
     useCallback(() => {
-      if (search) {
+      if (debouncedSearch) {
         handleSearch();
       }
+
       const onBackPress = () => {
         Alert.alert("Exit App", "Are you sure you want to exit?", [
           { text: "Cancel", style: "cancel" },
@@ -87,11 +96,13 @@ export default function Home() {
         ]);
         return true;
       };
+
       BackHandler.addEventListener("hardwareBackPress", onBackPress);
       return () =>
         BackHandler.removeEventListener("hardwareBackPress", onBackPress);
-    }, [search])
+    }, [debouncedSearch])
   );
+
   const handleRoute = (item) => {
     navigation.navigate({ name: item.name });
   };
