@@ -73,6 +73,7 @@ export default function Home() {
   } = useSearch();
   const { profile } = useSelector((state) => state.profile);
   const search = useSelector((state) => state.home.searchStore);
+  console.log("search: ", search);
   const toast = useToast();
   useFocusEffect(
     useCallback(() => {
@@ -89,7 +90,7 @@ export default function Home() {
       BackHandler.addEventListener("hardwareBackPress", onBackPress);
       return () =>
         BackHandler.removeEventListener("hardwareBackPress", onBackPress);
-    }, [])
+    }, [search])
   );
   const handleRoute = (item) => {
     navigation.navigate({ name: item.name });

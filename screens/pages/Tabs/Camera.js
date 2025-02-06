@@ -33,7 +33,7 @@ export default function QrCamera() {
   const { hasPermission, requestPermission } = useCameraPermission();
   const [animationValue] = useState(new Animated.Value(0));
   const [showImagePopup, setShowImagePopup] = useState(false);
-  const [barcodeMode, setBarcodeMode] = useState(false);
+  const [barcodeMode, setBarcodeMode] = useState(true);
   useEffect(() => {
     if (!hasPermission) {
       requestPermission();

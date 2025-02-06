@@ -53,9 +53,7 @@ export default function Communication({ navigation }) {
           );
         }
       }
-    } catch (error) {
-      console.error("Error fetching user from AsyncStorage:", error);
-    }
+    } catch (error) {}
   };
   const scrollViewRef = useRef(null);
   useEffect(() => {
@@ -93,11 +91,10 @@ export default function Communication({ navigation }) {
         );
         const saveData = await saveResponse.json();
         if (!saveData.success) {
-          console.warn("Failed to store message:", saveData.error);
           return;
         }
         const tokenResponse = await fetch(
-          "http://172.17.58.151:9000/auth/getAllPushTokens"
+          `http://172.17.58.151:9000/auth/getAllPushTokens/${profile?.stdprofile[0]?.regdno}`
         );
         const tokenData = await tokenResponse.json();
         if (
@@ -105,11 +102,10 @@ export default function Communication({ navigation }) {
           !tokenData.pushTokens ||
           tokenData.pushTokens.length === 0
         ) {
-          console.warn("No valid push tokens found.");
           return;
         }
         const pushTokens = tokenData.pushTokens;
-        await fetch("http://172.17.58.151:9000/auth/expoPushNotification", {
+        fetch("http://172.17.58.151:9000/auth/expoPushNotification", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -120,9 +116,7 @@ export default function Communication({ navigation }) {
             body: message,
           }),
         });
-      } catch (error) {
-        console.error("Error sending message and notification:", error);
-      }
+      } catch (error) {}
     }
   }, [message, profile]);
   const getMessageDateLabel = (messageTime) => {
@@ -179,7 +173,7 @@ export default function Communication({ navigation }) {
           )}
           {expanded && (
             <Text
-              color="blue.500"
+              color="warning.500"
               fontSize="md"
               textAlign={"center"}
               onPress={() => setExpanded(false)}
