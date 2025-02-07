@@ -33,8 +33,8 @@ const useSearch = () => {
   };
   const handleClear = () => {
     setSearch("");
+    dispatch(searchState());
     setIsSearchTriggered(false);
-    dispatch(clearState());
   };
   return {
     search,

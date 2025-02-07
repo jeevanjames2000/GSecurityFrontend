@@ -1,4 +1,13 @@
-import { HStack, VStack, Text, Center, View, Input, Button } from "native-base";
+import {
+  HStack,
+  VStack,
+  Text,
+  Center,
+  View,
+  Input,
+  Button,
+  Image,
+} from "native-base";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDataBySearchQuery } from "../../../store/slices/homeSlice";
@@ -10,6 +19,7 @@ export default function VisitorDetailsCard() {
   const dispatch = useDispatch();
   const [isOtpSubmitted, setIsOtpSubmitted] = useState(false);
   const [otp, setOtp] = useState("");
+
   if (noProfile) {
     return (
       <View

@@ -20,11 +20,11 @@ import * as ImagePicker from "expo-image-picker";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import useSearch from "../../../hooks/useSearch";
 import { useDispatch } from "react-redux";
-import { searchState } from "../../../store/slices/homeSlice";
+import { clearState, searchState } from "../../../store/slices/homeSlice";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 export default function QrCamera() {
   const navigation = useNavigation();
-  const { setSearch, handleSearch } = useSearch();
+  const { handleClear } = useSearch();
   const [isFlashOn, setIsFlashOn] = useState(false);
   const [cameraFacing, setCameraFacing] = useState("back");
   const device = useCameraDevice(cameraFacing);
@@ -121,6 +121,8 @@ export default function QrCamera() {
   });
   useFocusEffect(
     React.useCallback(() => {
+      dispatch(clearState());
+      handleClear();
       setScannedData(null);
     }, [])
   );

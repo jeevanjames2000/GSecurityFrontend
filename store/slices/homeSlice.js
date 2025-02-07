@@ -79,7 +79,9 @@ const homeSlice = createSlice({
       state.cardType = action.payload;
     },
     clearState: (state) => {
-      Object.assign(state, initialState);
+      state.searchStore = "";
+      state.cardData = [];
+      state.cardType = "";
     },
   },
   extraReducers: (builder) => {

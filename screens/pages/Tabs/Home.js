@@ -75,12 +75,12 @@ export default function Home() {
   const search = useSelector((state) => state.home.searchStore);
   const toast = useToast();
   const [debouncedSearch, setDebouncedSearch] = useState(search);
-
   useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedSearch(search);
+      if (search?.trim() !== "") {
+        setDebouncedSearch(search);
+      }
     }, 500);
-
     return () => clearTimeout(handler);
   }, [search]);
   useFocusEffect(
@@ -88,7 +88,6 @@ export default function Home() {
       if (debouncedSearch) {
         handleSearch();
       }
-
       const onBackPress = () => {
         Alert.alert("Exit App", "Are you sure you want to exit?", [
           { text: "Cancel", style: "cancel" },
@@ -96,13 +95,11 @@ export default function Home() {
         ]);
         return true;
       };
-
       BackHandler.addEventListener("hardwareBackPress", onBackPress);
       return () =>
         BackHandler.removeEventListener("hardwareBackPress", onBackPress);
     }, [debouncedSearch])
   );
-
   const handleRoute = (item) => {
     navigation.navigate({ name: item.name });
   };
@@ -328,7 +325,7 @@ export default function Home() {
           )}
         </HStack>
       </Box>
-      {isSearchTriggered && search.length > 0 ? (
+      {isSearchTriggered && search?.length > 0 ? (
         <ScrollView
           contentContainerStyle={{
             flexGrow: 1,
