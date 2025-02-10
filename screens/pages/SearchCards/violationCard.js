@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Box, Text, Image, HStack, VStack, Badge, View } from "native-base";
+import { Box, Text, Image, HStack, VStack, Badge, useToast } from "native-base";
 import { Pressable } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 export default function ViolationsCard() {
+  const toast = useToast();
   const { cardData, image, noProfile, profile } = useSelector(
     (state) => state.home
   );
+  const { profile: SecurityProfile } = useSelector((state) => state.profile);
+
   const [leaves, setLeaves] = useState(null);
   const fetchLeavePermissions = async () => {
     try {
@@ -37,26 +40,74 @@ export default function ViolationsCard() {
   const handleShowViolations = () => {
     navigation.navigate("AddViolations");
   };
-  if (noProfile || profile == null) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Image
-          source={{
-            uri: "http://172.17.58.151:9000/auth/getImage/Group 11.png",
-          }}
-          alt="No Results icon"
-          style={{ width: 200, height: 200 }}
-          resizeMode="contain"
-        />
-      </View>
+  const postCheckInOut = async (status, data) => {
+    const API_URL = "https://studentmobileapi.gitam.edu/PostCheckinout";
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          permissions: [
+            {
+              ...data,
+              status: status,
+            },
+          ],
+        }),
+      });
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      console.log("error: ", error);
+      return { success: false, error: error.message };
+    }
+  };
+  const handleLeavePermissions = async (type) => {
+    const checkInData = {
+      regdno: profile?.stdprofile[0]?.regdno,
+      genarated_by: SecurityProfile?.userName || "security",
+    };
+
+    const checkOutData = {
+      regdno: profile?.stdprofile[0]?.regdno,
+      name: profile?.stdprofile[0]?.name,
+      hostelacno: "111",
+      gender: profile?.stdprofile[0]?.gender,
+      parent_mobile: profile?.stdprofile[0]?.parent_mobile,
+      campus: profile?.stdprofile[0]?.campus,
+      genarated_by: SecurityProfile?.userName || "security",
+    };
+
+    const response = await postCheckInOut(
+      type,
+      type === "checkin" ? checkInData : checkOutData
     );
-  }
+    console.log("Response:", response.status);
+    if (response.status === "success") {
+      toast.show({
+        render: () => (
+          <Box bg="green.300" px="4" py="2" rounded="md" shadow={2}>
+            {response?.message}
+          </Box>
+        ),
+        placement: "top-right",
+      });
+    } else {
+      const errorMessage = response?.message || "Already in campus";
+      toast.show({
+        render: () => (
+          <Box bg="red.300" px="4" py="2" rounded="md" shadow={2}>
+            {errorMessage}
+          </Box>
+        ),
+        placement: "top-right",
+      });
+      throw new Error(response.message || "Something went wrong");
+    }
+  };
+
   const CustomButton = ({
     onPress,
     iconName,
@@ -130,6 +181,7 @@ export default function ViolationsCard() {
           }
           borderColor="#37474F"
           status={leaves?.getpermissionstatus[0]?.isapprove === "I"}
+          onPress={() => handleLeavePermissions("checkin")}
         />
         <CustomButton
           text="Check Out"
@@ -142,6 +194,7 @@ export default function ViolationsCard() {
             leaves?.getpermissionstatus[0]?.isapprove === "L" ? "black" : "#fff"
           }
           status={leaves?.getpermissionstatus[0]?.isapprove === "L"}
+          onPress={() => handleLeavePermissions("checkout")}
         />
       </HStack>
     </Box>

@@ -10,12 +10,10 @@ import {
 } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function Communication({ navigation }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(null);
   const { profile } = useSelector((state) => state.profile);
   const formatTime = (time) => {
     if (!time) return "N/A";
@@ -30,20 +28,14 @@ export default function Communication({ navigation }) {
   };
   const fetchMessages = async () => {
     try {
-      const formattedDate = date ? date.toISOString().split("T")[0] : null;
-      const url = formattedDate
-        ? `http://172.17.58.151:9000/auth/getAllMessages?date=${formattedDate}`
-        : "http://172.17.58.151:9000/auth/getAllMessages";
-
-      const response = await fetch(url);
+      const response = await fetch(
+        "http://172.17.58.151:9000/auth/getAllMessages"
+      );
       const data = await response.json();
-
       if (data.success) {
         setMessages(data.messages);
       }
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-    }
+    } catch (error) {}
   };
   const fetchUser = async () => {
     try {
@@ -61,7 +53,9 @@ export default function Communication({ navigation }) {
           );
         }
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error fetching user from AsyncStorage:", error);
+    }
   };
   const scrollViewRef = useRef(null);
   useEffect(() => {
@@ -99,6 +93,7 @@ export default function Communication({ navigation }) {
         );
         const saveData = await saveResponse.json();
         if (!saveData.success) {
+          console.warn("Failed to store message:", saveData.error);
           return;
         }
         const tokenResponse = await fetch(
@@ -110,10 +105,11 @@ export default function Communication({ navigation }) {
           !tokenData.pushTokens ||
           tokenData.pushTokens.length === 0
         ) {
+          console.warn("No valid push tokens found.");
           return;
         }
         const pushTokens = tokenData.pushTokens;
-        fetch("http://172.17.58.151:9000/auth/expoPushNotification", {
+        await fetch("http://172.17.58.151:9000/auth/expoPushNotification", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -124,7 +120,9 @@ export default function Communication({ navigation }) {
             body: message,
           }),
         });
-      } catch (error) {}
+      } catch (error) {
+        console.error("Error sending message and notification:", error);
+      }
     }
   }, [message, profile]);
   const getMessageDateLabel = (messageTime) => {
@@ -152,6 +150,13 @@ export default function Communication({ navigation }) {
     acc[dateLabel].push(msg);
     return acc;
   }, {});
+  const sortedGroupedMessages = Object.entries(groupedMessages).sort(
+    ([a], [b]) => {
+      if (a === "Today") return 1;
+      if (b === "Today") return -1;
+      return new Date(a) - new Date(b);
+    }
+  );
   function MessageItem({ msg }) {
     const [expanded, setExpanded] = useState(false);
     const isLongMessage = msg?.message.length > 100;
@@ -181,7 +186,7 @@ export default function Communication({ navigation }) {
           )}
           {expanded && (
             <Text
-              color="warning.500"
+              color="blue.500"
               fontSize="md"
               textAlign={"center"}
               onPress={() => setExpanded(false)}
@@ -220,22 +225,6 @@ export default function Communication({ navigation }) {
           </VStack>
         </HStack>
       </Box>
-      <HStack alignItems="center" justifyContent="center" p={3}>
-        <Text fontSize={16} fontWeight="bold">
-          Select Date:{" "}
-        </Text>
-        <DateTimePicker
-          value={selectedDate || new Date()}
-          mode="date"
-          display="default"
-          onChange={(event, date) => {
-            if (date) {
-              setSelectedDate(date);
-              fetchMessages(date);
-            }
-          }}
-        />
-      </HStack>
       <ScrollView
         ref={scrollViewRef}
         flex={1}
@@ -246,7 +235,7 @@ export default function Communication({ navigation }) {
           scrollViewRef.current.scrollToEnd({ animated: true })
         }
       >
-        {Object.entries(groupedMessages).map(([dateLabel, msgs], index) => (
+        {sortedGroupedMessages.map(([dateLabel, msgs], index) => (
           <React.Fragment key={index}>
             <Box
               alignSelf="center"
