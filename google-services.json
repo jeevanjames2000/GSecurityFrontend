@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1031293119319",
+    "project_id": "g-security-6e175",
+    "storage_bucket": "g-security-6e175.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1031293119319:android:690c0aeb1d553d51e5ac12",
+        "android_client_info": {
+          "package_name": "com.gitamCats.edu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTaqQwCj3RFsi3kC4od4Zm-uRVQAnLQw8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

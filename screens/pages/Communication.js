@@ -10,10 +10,12 @@ import {
 } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function Communication({ navigation }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
   const { profile } = useSelector((state) => state.profile);
   const formatTime = (time) => {
     if (!time) return "N/A";
@@ -28,14 +30,20 @@ export default function Communication({ navigation }) {
   };
   const fetchMessages = async () => {
     try {
-      const response = await fetch(
-        "http://172.17.58.151:9000/auth/getAllMessages"
-      );
+      const formattedDate = date ? date.toISOString().split("T")[0] : null;
+      const url = formattedDate
+        ? `http://172.17.58.151:9000/auth/getAllMessages?date=${formattedDate}`
+        : "http://172.17.58.151:9000/auth/getAllMessages";
+
+      const response = await fetch(url);
       const data = await response.json();
+
       if (data.success) {
         setMessages(data.messages);
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+    }
   };
   const fetchUser = async () => {
     try {
@@ -212,6 +220,22 @@ export default function Communication({ navigation }) {
           </VStack>
         </HStack>
       </Box>
+      <HStack alignItems="center" justifyContent="center" p={3}>
+        <Text fontSize={16} fontWeight="bold">
+          Select Date:{" "}
+        </Text>
+        <DateTimePicker
+          value={selectedDate || new Date()}
+          mode="date"
+          display="default"
+          onChange={(event, date) => {
+            if (date) {
+              setSelectedDate(date);
+              fetchMessages(date);
+            }
+          }}
+        />
+      </HStack>
       <ScrollView
         ref={scrollViewRef}
         flex={1}
