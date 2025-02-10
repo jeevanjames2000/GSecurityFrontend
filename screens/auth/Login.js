@@ -116,6 +116,8 @@ export default function Login({ navigation }) {
             </Box>
           ),
           placement: "top-right",
+          duration: 3000,
+          isClosable: true,
         });
       } else {
         setError(data.error || "Invalid credentials. Please try again.");

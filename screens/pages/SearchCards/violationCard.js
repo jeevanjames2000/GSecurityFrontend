@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Text, Image, HStack, VStack, Badge, useToast } from "native-base";
-import { Pressable } from "react-native";
+import { Pressable, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 export default function ViolationsCard() {
@@ -9,7 +9,6 @@ export default function ViolationsCard() {
     (state) => state.home
   );
   const { profile: SecurityProfile } = useSelector((state) => state.profile);
-
   const [leaves, setLeaves] = useState(null);
   const fetchLeavePermissions = async () => {
     try {
@@ -60,52 +59,72 @@ export default function ViolationsCard() {
       const result = await response.json();
       return result;
     } catch (error) {
-      console.log("error: ", error);
       return { success: false, error: error.message };
     }
   };
-  const handleLeavePermissions = async (type) => {
-    const checkInData = {
-      regdno: profile?.stdprofile[0]?.regdno,
-      genarated_by: SecurityProfile?.userName || "security",
-    };
 
-    const checkOutData = {
-      regdno: profile?.stdprofile[0]?.regdno,
-      name: profile?.stdprofile[0]?.name,
-      hostelacno: "111",
-      gender: profile?.stdprofile[0]?.gender,
-      parent_mobile: profile?.stdprofile[0]?.parent_mobile,
-      campus: profile?.stdprofile[0]?.campus,
-      genarated_by: SecurityProfile?.userName || "security",
-    };
+  const handleLeavePermissions = (type) => {
+    Alert.alert(
+      "Confirmation",
+      `Are you sure you want to ${
+        type === "checkin" ? "Check In" : "Check Out"
+      }?`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Confirm",
+          onPress: async () => {
+            const checkInData = {
+              regdno: profile?.stdprofile[0]?.regdno,
+              genarated_by: SecurityProfile?.userName || "security",
+            };
+            const checkOutData = {
+              regdno: profile?.stdprofile[0]?.regdno,
+              name: profile?.stdprofile[0]?.name,
+              hostelacno: profile?.stdprofile[0]?.hosteL_ACNO,
+              gender: profile?.stdprofile[0]?.gender,
+              parent_mobile: profile?.stdprofile[0]?.parent_mobile,
+              campus: profile?.stdprofile[0]?.campus,
+              genarated_by: SecurityProfile?.userName || "security",
+            };
 
-    const response = await postCheckInOut(
-      type,
-      type === "checkin" ? checkInData : checkOutData
+            const response = await postCheckInOut(
+              type,
+              type === "checkin" ? checkInData : checkOutData
+            );
+
+            if (response.status === "success") {
+              toast.show({
+                render: () => (
+                  <Box bg="green.300" px="4" py="2" rounded="md" shadow={2}>
+                    {response?.message}
+                  </Box>
+                ),
+                placement: "top-right",
+                duration: 3000,
+              });
+            } else {
+              const errorMessage = response?.message || "Already in campus";
+              toast.show({
+                render: () => (
+                  <Box bg="red.300" px="4" py="2" rounded="md" shadow={2}>
+                    {errorMessage}
+                  </Box>
+                ),
+                placement: "top-right",
+                duration: 3000,
+                isClosable: true,
+              });
+              throw new Error(response.message || "Something went wrong");
+            }
+          },
+        },
+      ],
+      { cancelable: true }
     );
-    console.log("Response:", response.status);
-    if (response.status === "success") {
-      toast.show({
-        render: () => (
-          <Box bg="green.300" px="4" py="2" rounded="md" shadow={2}>
-            {response?.message}
-          </Box>
-        ),
-        placement: "top-right",
-      });
-    } else {
-      const errorMessage = response?.message || "Already in campus";
-      toast.show({
-        render: () => (
-          <Box bg="red.300" px="4" py="2" rounded="md" shadow={2}>
-            {errorMessage}
-          </Box>
-        ),
-        placement: "top-right",
-      });
-      throw new Error(response.message || "Something went wrong");
-    }
   };
 
   const CustomButton = ({
@@ -163,42 +182,56 @@ export default function ViolationsCard() {
       </HStack>
     </Box>
   );
-  const LeavesPermissionsStack = ({ handleCheckIn, handleCheckOut }) => (
-    <Box bg="#F5F5F5" borderRadius="xl" padding="4" marginTop="4">
-      <Text fontSize="lg" fontWeight="bold" color="#007367" marginBottom="4">
-        Leaves & Permissions ({leaves?.getpermissionstatus?.length || 0})
-      </Text>
-      <HStack justifyContent="space-between" space={4}>
-        <CustomButton
-          text="Check In"
-          bgColor={
-            leaves?.getpermissionstatus[0]?.isapprove === "I"
-              ? "#fff"
-              : "#007367"
-          }
-          textColor={
-            leaves?.getpermissionstatus[0]?.isapprove === "I" ? "black" : "#fff"
-          }
-          borderColor="#37474F"
-          status={leaves?.getpermissionstatus[0]?.isapprove === "I"}
-          onPress={() => handleLeavePermissions("checkin")}
-        />
-        <CustomButton
-          text="Check Out"
-          bgColor={
-            leaves?.getpermissionstatus[0]?.isapprove === "L"
-              ? "#fff"
-              : "#007367"
-          }
-          textColor={
-            leaves?.getpermissionstatus[0]?.isapprove === "L" ? "black" : "#fff"
-          }
-          status={leaves?.getpermissionstatus[0]?.isapprove === "L"}
-          onPress={() => handleLeavePermissions("checkout")}
-        />
-      </HStack>
-    </Box>
-  );
+  const LeavesPermissionsStack = () => {
+    const isDisabled =
+      !leaves?.getpermissionstatus || leaves.getpermissionstatus.length === 0;
+
+    return (
+      <Box bg="#F5F5F5" borderRadius="xl" padding="4" marginTop="4">
+        <Text fontSize="lg" fontWeight="bold" color="#007367" marginBottom="4">
+          Leaves & Permissions ({leaves?.getpermissionstatus?.length || 0})
+        </Text>
+        <HStack justifyContent="space-between" space={4}>
+          <CustomButton
+            text="Check In"
+            bgColor={
+              isDisabled || leaves?.getpermissionstatus[0]?.isapprove === "I"
+                ? "#fff"
+                : "#007367"
+            }
+            textColor={
+              isDisabled || leaves?.getpermissionstatus[0]?.isapprove === "I"
+                ? "black"
+                : "#fff"
+            }
+            borderColor="#37474F"
+            status={
+              isDisabled || leaves?.getpermissionstatus[0]?.isapprove === "I"
+            }
+            onPress={() => handleLeavePermissions("checkin")}
+          />
+          <CustomButton
+            text="Check Out"
+            bgColor={
+              isDisabled || leaves?.getpermissionstatus[0]?.isapprove === "L"
+                ? "#fff"
+                : "#007367"
+            }
+            textColor={
+              isDisabled || leaves?.getpermissionstatus[0]?.isapprove === "L"
+                ? "black"
+                : "#fff"
+            }
+            status={
+              isDisabled || leaves?.getpermissionstatus[0]?.isapprove === "L"
+            }
+            onPress={() => handleLeavePermissions("checkout")}
+          />
+        </HStack>
+      </Box>
+    );
+  };
+
   return (
     <Box padding="6" shadow="9" bg="#fff" borderRadius="xl">
       <HStack space="lg">

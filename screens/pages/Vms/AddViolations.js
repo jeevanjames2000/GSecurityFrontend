@@ -50,6 +50,20 @@ export default function AddViolations() {
   const [selectedValues, setSelectedValues] = useState([]);
   const [vehicleNumber, setVehicleNumber] = useState("");
   const [name, setName] = useState(profile?.stdprofile?.[0]?.name);
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    let newErrors = {};
+
+    if (selectedValues.length === 0)
+      newErrors.violationCategory = "Violation category is required";
+    if (!vehicleNumber.trim())
+      newErrors.vehicleNumber = "Vehicle number is required";
+    if (!comments.trim()) newErrors.comments = "Comments are required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
   const handlePickImages = async () => {
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -84,7 +98,13 @@ export default function AddViolations() {
     );
   };
   const [fine, setFine] = useState(0);
-  const CustomActionSheet = ({ isOpen, onClose, onSubmit, selectedValues }) => {
+  const CustomActionSheet = ({
+    isOpen,
+    onClose,
+    onSubmit,
+    selectedValues,
+    setErrors,
+  }) => {
     const [tempSelectedValues, setTempSelectedValues] =
       useState(selectedValues);
     const [totalFines, setTotalFines] = useState(0);
@@ -111,6 +131,13 @@ export default function AddViolations() {
     };
     const handleSubmit = () => {
       onSubmit(tempSelectedValues, totalFines);
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        violationCategory:
+          tempSelectedValues.length > 0
+            ? undefined
+            : "Violation category is required",
+      }));
       onClose();
     };
     useEffect(() => {
@@ -144,9 +171,10 @@ export default function AddViolations() {
               isChecked={tempSelectedValues.includes(label)}
               onChange={() => handleCheckboxChange(label)}
             >
-              {`${label} - ₹${fines[label]}`}
+              {fines[label] ? `${label} - ₹${fines[label]}` : label}
             </Checkbox>
           ))}
+
           <Box mt={4}>
             <Text style={{ fontSize: 18, fontWeight: "700" }}>
               Total Fines: ₹{totalFines}
@@ -170,6 +198,11 @@ export default function AddViolations() {
     );
   };
   const handleActionSheetSubmit = (values, fines) => {
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      violationCategory:
+        values.length > 0 ? undefined : "Violation category is required",
+    }));
     setSelectedValues(values);
     setFine(fines);
   };
@@ -228,6 +261,8 @@ export default function AddViolations() {
               );
             },
             placement: "top-right",
+            duration: 3000,
+            isClosable: true,
           });
           navigation.goBack();
           setName("");
@@ -256,11 +291,12 @@ export default function AddViolations() {
             );
           },
           placement: "bottom",
+          duration: 3000,
+          isClosable: true,
         });
         setIsLoading(false);
       }
     } catch (error) {
-      console.error("Error uploading images:", error);
       toast.show({
         render: () => {
           return (
@@ -278,6 +314,7 @@ export default function AddViolations() {
           );
         },
         placement: "top-right",
+        duration: 3000,
       });
       Alert.alert("Error", "Failed to upload violation. Please try again.");
       setIsLoading(false);
@@ -345,6 +382,7 @@ export default function AddViolations() {
     </Stack>
   );
   const handleSubmit = () => {
+    if (!validateForm()) return;
     handleUploadImage(selectedImages);
   };
   return (
@@ -413,30 +451,6 @@ export default function AddViolations() {
                   marginBottom: 2,
                 }}
               >
-                Vehicle Number
-              </FormControl.Label>
-              <Input
-                value={vehicleNumber}
-                onChangeText={setVehicleNumber}
-                placeholder={"Vehicle Number"}
-                variant="filled"
-                bg="#F0F2F5"
-                p={3}
-                borderRadius="md"
-                width="100%"
-                fontSize={16}
-                _focus={{ bg: "#fff" }}
-              />
-            </Stack>
-            <Stack>
-              <FormControl.Label
-                _text={{
-                  fontSize: 20,
-                  color: "#000",
-                  fontWeight: 700,
-                  marginBottom: 2,
-                }}
-              >
                 Violation Category
               </FormControl.Label>
               <TouchableOpacity
@@ -447,6 +461,8 @@ export default function AddViolations() {
                   backgroundColor: "#F0F2F5",
                   padding: 14,
                   borderRadius: 4,
+                  borderWidth: errors.violationCategory ? 1 : 0,
+                  borderColor: errors.violationCategory ? "red" : "transparent",
                 }}
               >
                 <Text style={{ color: "#637587", fontSize: 16, flex: 1 }}>
@@ -461,13 +477,49 @@ export default function AddViolations() {
                   style={{ marginLeft: "auto" }}
                 />
               </TouchableOpacity>
+              {errors.violationCategory && (
+                <Text color="red.500">{errors.violationCategory}</Text>
+              )}
             </Stack>
             <CustomActionSheet
               isOpen={isActionSheetOpen}
               onClose={() => setActionSheetOpen(false)}
               selectedValues={selectedValues}
               onSubmit={handleActionSheetSubmit}
+              setErrors={setErrors}
             />
+            <Stack>
+              <FormControl.Label
+                _text={{
+                  fontSize: 20,
+                  color: "#000",
+                  fontWeight: 700,
+                  marginBottom: 2,
+                }}
+              >
+                Vehicle Number
+              </FormControl.Label>
+              <Input
+                value={vehicleNumber}
+                onChangeText={(text) => {
+                  setVehicleNumber(text);
+                  setErrors((prev) => ({ ...prev, vehicleNumber: "" }));
+                }}
+                placeholder="Vehicle Number"
+                variant="filled"
+                bg="#F0F2F5"
+                p={3}
+                borderRadius="md"
+                width="100%"
+                fontSize={16}
+                _focus={{ bg: "#fff" }}
+                borderColor={errors.vehicleNumber ? "red.500" : "gray.300"}
+              />
+              {errors.vehicleNumber && (
+                <Text color="red.500">{errors.vehicleNumber}</Text>
+              )}
+            </Stack>
+
             <Stack>
               <FormControl.Label
                 _text={{
@@ -479,18 +531,25 @@ export default function AddViolations() {
               >
                 Comments
               </FormControl.Label>
-              <View style={styles.textAreaContainer}>
+              <View style={[styles.textAreaContainer]}>
                 <TextArea
                   h={20}
                   fontSize={16}
                   w="100%"
                   color="#637587"
                   bg="#F0F2F5"
+                  borderColor={errors.vehicleNumber ? "red.500" : "gray.300"}
                   value={comments}
                   placeholder="Enter Violation Information"
-                  onChangeText={setComments}
+                  onChangeText={(text) => {
+                    setComments(text);
+                    setErrors((prev) => ({ ...prev, comments: "" }));
+                  }}
                 />
               </View>
+              {errors.comments && (
+                <Text color="red.500">{errors.comments}</Text>
+              )}
             </Stack>
             <UploadPhoto
               selectedImages={selectedImages}

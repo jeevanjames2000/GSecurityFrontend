@@ -21,11 +21,8 @@ export default function AddGatepass() {
   const navigation = useNavigation();
   const [passType, setPassType] = useState("");
   const [issuedTo, setIssuedTo] = useState("Employee");
-  const [issuedBy, setIssuedBy] = useState("");
-  const [issuedFrom, setIssuedFrom] = useState("");
   const [mobile, setMobile] = useState("");
   const [vehicle, setVehicle] = useState("");
-  const [empId, setEmpId] = useState("");
   const [name, setName] = useState("");
   const [remarks, setRemarks] = useState("");
   const [particulars, setParticulars] = useState([
@@ -92,6 +89,8 @@ export default function AddGatepass() {
           );
         },
         placement: "top-right",
+        isClosable: true,
+        duration: 3000,
       });
     } else {
       const errorMessage =
@@ -112,6 +111,8 @@ export default function AddGatepass() {
           );
         },
         placement: "top-right",
+        duration: 3000,
+        isClosable: true,
       });
     }
   };

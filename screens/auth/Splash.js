@@ -36,6 +36,8 @@ export default function SplashScreen({ navigation, route }) {
             </Box>
           ),
           placement: "top-right",
+          duration: 3000,
+          isClosable: true,
         });
         setTimeout(() => {
           navigation.replace("Login", {

@@ -59,6 +59,8 @@ const GatepassCard = React.memo(() => {
               </Box>
             ),
             placement: "top-right",
+            duration: 3000,
+            isClosable: true,
           });
         }, 500);
       } else {
@@ -71,6 +73,8 @@ const GatepassCard = React.memo(() => {
             </Box>
           ),
           placement: "top-right",
+          duration: 3000,
+          isClosable: true,
         });
       }
     } catch (error) {
@@ -82,6 +86,8 @@ const GatepassCard = React.memo(() => {
           </Box>
         ),
         placement: "top-right",
+        duration: 3000,
+        isClosable: true,
       });
     }
   };

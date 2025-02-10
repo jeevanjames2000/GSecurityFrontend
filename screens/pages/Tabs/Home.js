@@ -159,6 +159,8 @@ export default function Home() {
                 </Box>
               ),
               placement: "top-right",
+              duration: 3000,
+              isClosable: true,
             })
       }
       flex={1}
