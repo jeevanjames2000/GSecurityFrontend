@@ -9,12 +9,14 @@ import {
   Pressable,
 } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { logErrorToDB } from "../../store/slices/loggerSlice";
 export default function Communication({ navigation }) {
+  const dispatch = useDispatch();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const { profile } = useSelector((state) => state.profile);
+  const { profile, deviceType } = useSelector((state) => state.profile);
   const formatTime = (time) => {
     if (!time) return "N/A";
     const date = new Date(time);
@@ -35,7 +37,18 @@ export default function Communication({ navigation }) {
       if (data.success) {
         setMessages(data.messages);
       }
-    } catch (error) {}
+    } catch (error) {
+      const errorDetails = {
+        errorLevel: "error",
+        errorMessage: "Error Fetching messages at communications",
+        errorType: "API error",
+        totalActiveUsers: 0,
+        errorLocation: "Communications",
+        deviceType: deviceType,
+      };
+
+      dispatch(logErrorToDB(errorDetails));
+    }
   };
   const fetchUser = async () => {
     try {
@@ -54,7 +67,16 @@ export default function Communication({ navigation }) {
         }
       }
     } catch (error) {
-      console.error("Error fetching user from AsyncStorage:", error);
+      const errorDetails = {
+        errorLevel: "error",
+        errorMessage: "Error Fetching data from Local storage",
+        errorType: "AyncStorage Error",
+        totalActiveUsers: 0,
+        errorLocation: "Communications",
+        deviceType: deviceType,
+      };
+
+      dispatch(logErrorToDB(errorDetails));
     }
   };
   const scrollViewRef = useRef(null);
@@ -121,7 +143,15 @@ export default function Communication({ navigation }) {
           }),
         });
       } catch (error) {
-        console.error("Error sending message and notification:", error);
+        const errorDetails = {
+          errorLevel: "error",
+          errorMessage: error || "error sending message or push notifications",
+          errorType: "API error",
+          totalActiveUsers: 0,
+          errorLocation: "Communications",
+          deviceType: deviceType,
+        };
+        dispatch(logErrorToDB(errorDetails));
       }
     }
   }, [message, profile]);
@@ -142,7 +172,10 @@ export default function Communication({ navigation }) {
       year: "numeric",
     });
   };
-  const groupedMessages = messages.reduce((acc, msg) => {
+  const sortedMessages = messages.sort(
+    (a, b) => new Date(a.time) - new Date(b.time)
+  );
+  const groupedMessages = sortedMessages.reduce((acc, msg) => {
     const dateLabel = getMessageDateLabel(msg.time);
     if (!acc[dateLabel]) {
       acc[dateLabel] = [];

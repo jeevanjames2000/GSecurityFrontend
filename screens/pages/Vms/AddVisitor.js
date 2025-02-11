@@ -22,9 +22,7 @@ const AddVisitor = () => {
   const [purpose, setPurpose] = useState("");
   const [visitingDept, setVisitingDept] = useState("");
   const [whomToMeet, setWhomToMeet] = useState("");
-  const handleSendOtp = () => {
-    console.log("OTP sent to:", contactNo);
-  };
+  const handleSendOtp = () => {};
   const handleSubmit = () => {
     console.log({
       visitorName,

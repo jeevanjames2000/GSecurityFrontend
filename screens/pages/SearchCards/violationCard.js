@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Box, Text, Image, HStack, VStack, Badge, useToast } from "native-base";
+import {
+  Box,
+  Text,
+  Image,
+  HStack,
+  VStack,
+  Badge,
+  useToast,
+  View,
+} from "native-base";
 import { Pressable, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
@@ -27,6 +36,26 @@ export default function ViolationsCard() {
       setLeaves(data);
     } catch (error) {}
   };
+  if (!profile || !cardData) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Image
+          source={{
+            uri: "http://172.17.58.151:9000/auth/getImage/Group 11.png",
+          }}
+          alt="No Results icon"
+          style={{ width: 200, height: 200 }}
+          resizeMode="contain"
+        />
+      </View>
+    );
+  }
   useEffect(() => {
     if (
       profile?.stdprofile[0]?.hostler === "Y" &&

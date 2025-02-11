@@ -18,7 +18,10 @@ import SkeletonCard from "../SearchCards/skeletonCard";
 import ViolationsCard from "../SearchCards/violationCard";
 import VisitorDetailsCard from "../SearchCards/visitorsCard";
 import useSearch from "../../../hooks/useSearch";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setDeviceType } from "../../../store/slices/profileSlice";
+import * as Device from "expo-device";
+
 const featuredData = [
   {
     name: "CCTV",
@@ -60,6 +63,7 @@ const emergencyData = [
   },
 ];
 export default function Home() {
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const {
     setSearch,
@@ -68,6 +72,7 @@ export default function Home() {
     handleClear,
     isLoading,
     cardData,
+    noProfile,
     cardType,
     profile: homeProfile,
   } = useSearch();
@@ -81,11 +86,42 @@ export default function Home() {
         setDebouncedSearch(search);
       }
     }, 500);
+
     return () => clearTimeout(handler);
   }, [search]);
+  if (!cardData || noProfile) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text>hello</Text>
+        <Image
+          source={{
+            uri: "http://172.17.58.151:9000/auth/getImage/Group 11.png",
+          }}
+          alt="No Results icon"
+          style={{ width: 200, height: 200 }}
+          resizeMode="contain"
+        />
+      </View>
+    );
+  }
+  const [mongo, setMongo] = useState();
+
   useFocusEffect(
     useCallback(() => {
-      if (debouncedSearch) {
+      dispatch(
+        setDeviceType({
+          brand: Device.brand,
+          name: Device.deviceName,
+          os: Device.osName,
+        })
+      );
+      if (debouncedSearch?.length > 3) {
         handleSearch();
       }
       const onBackPress = () => {

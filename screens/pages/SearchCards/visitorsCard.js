@@ -16,6 +16,27 @@ export default function VisitorDetailsCard() {
     (state) => state.home
   );
 
+  if (!cardData) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Image
+          source={{
+            uri: "http://172.17.58.151:9000/auth/getImage/Group 11.png",
+          }}
+          alt="No Results icon"
+          style={{ width: 200, height: 200 }}
+          resizeMode="contain"
+        />
+      </View>
+    );
+  }
+
   const dispatch = useDispatch();
   const [isOtpSubmitted, setIsOtpSubmitted] = useState(false);
   const [otp, setOtp] = useState("");

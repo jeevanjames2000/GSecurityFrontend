@@ -8,6 +8,7 @@ import {
   FormControl,
   useToast,
   Box,
+  Image,
 } from "native-base";
 import { Alert, Pressable } from "react-native";
 import useSearch from "../../../hooks/useSearch";
@@ -112,6 +113,26 @@ const GatepassCard = React.memo(() => {
       { cancelable: false }
     );
   };
+  if (!cardData) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Image
+          source={{
+            uri: "http://172.17.58.151:9000/auth/getImage/Group 11.png",
+          }}
+          alt="No Results icon"
+          style={{ width: 200, height: 200 }}
+          resizeMode="contain"
+        />
+      </View>
+    );
+  }
   return (
     <VStack padding="6" pt={2} shadow="6" bg={"#fff"} borderRadius={"xl"}>
       {selectedGatePass && particulars.length > 0 && (

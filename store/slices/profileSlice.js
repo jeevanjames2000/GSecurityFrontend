@@ -103,6 +103,7 @@ const initialState = {
   isLoading: false,
   error: null,
   image: null,
+  deviceType: "",
 };
 const profileSlice = createSlice({
   name: "profile",
@@ -116,6 +117,9 @@ const profileSlice = createSlice({
       state.image = null;
       AsyncStorage.removeItem("authUser");
       AsyncStorage.removeItem("profileImage");
+    },
+    setDeviceType: (state, action) => {
+      state.deviceType = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -131,7 +135,7 @@ const profileSlice = createSlice({
       })
       .addCase(fetchProfile.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.payload || "failed to fetch profile";
       })
       .addCase(loadProfileFromStorage.fulfilled, (state, action) => {
         state.profile = action.payload;
@@ -139,5 +143,6 @@ const profileSlice = createSlice({
       });
   },
 });
-export const { profileSearchState, clearProfile } = profileSlice.actions;
+export const { profileSearchState, clearProfile, setDeviceType } =
+  profileSlice.actions;
 export default profileSlice.reducer;

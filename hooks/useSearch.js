@@ -20,7 +20,7 @@ const useSearch = () => {
     dispatch(clearState());
     setIsSearchTriggered(true);
     dispatch(searchState(search));
-    const searchPrefix = search.toLowerCase().charAt(0);
+    const searchPrefix = search.toLowerCase().substring(0, 2);
     if (searchPrefix === "vm" || searchPrefix === "gp") {
       await dispatch(fetchDataBySearchQuery(search));
     } else {

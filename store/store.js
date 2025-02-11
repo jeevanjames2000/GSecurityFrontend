@@ -6,6 +6,7 @@ import profileReducer from "./slices/profileSlice";
 import gatePassReducer from "./slices/gatePassSlice";
 import homeSlice from "./slices/homeSlice";
 import authSlice from "./slices/authSlice";
+import loggerSlice from "./slices/loggerSlice";
 
 const profilePersistConfig = {
   key: "profile",
@@ -25,6 +26,7 @@ const store = configureStore({
     gatepass: gatePassReducer,
     home: homeSlice,
     auth: authSlice,
+    logger: loggerSlice,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
