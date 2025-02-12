@@ -28,6 +28,9 @@ export default function Login({ navigation }) {
   const dispatch = useDispatch();
   const INITIAL_OTP = Array(OTP_LENGTH).fill("");
   const [mobile, setMobile] = useState("");
+  const handleClear = () => {
+    setMobile("");
+  };
   const [otp, setOtp] = useState(INITIAL_OTP);
   const [otpSent, setOtpSent] = useState(false);
   const [error, setError] = useState(null);
@@ -71,6 +74,18 @@ export default function Login({ navigation }) {
       setOtp(newOtp);
       if (text.length === 1 && index < OTP_LENGTH - 1) {
         otpRefs[index + 1].current.focus();
+      }
+    },
+    [otp, otpRefs]
+  );
+  const handleKeyPress = useCallback(
+    (event, index) => {
+      if (
+        event.nativeEvent.key === "Backspace" &&
+        otp[index] === "" &&
+        index > 0
+      ) {
+        otpRefs[index - 1].current.focus();
       }
     },
     [otp, otpRefs]
@@ -199,11 +214,20 @@ export default function Login({ navigation }) {
                 maxLength={10}
                 _focus={{ bg: "#fff" }}
                 InputRightElement={
-                  <TouchableOpacity onPress={handleSendOtp}>
-                    <Text fontSize="lg" color="black" marginRight={3}>
-                      ➔
-                    </Text>
-                  </TouchableOpacity>
+                  <Box flexDirection="row" alignItems="center">
+                    {/* {mobile.length > 0 && (
+                      <TouchableOpacity onPress={handleClear}>
+                        <Text fontSize="lg" color="black" marginRight={5}>
+                          ✖
+                        </Text>
+                      </TouchableOpacity>
+                    )} */}
+                    <TouchableOpacity onPress={handleSendOtp}>
+                      <Text fontSize="xl" color="black" marginRight={5}>
+                        ➔
+                      </Text>
+                    </TouchableOpacity>
+                  </Box>
                 }
               />
               <Box
@@ -216,12 +240,12 @@ export default function Login({ navigation }) {
                     key={index}
                     value={digit}
                     onChangeText={(text) => handleChangeOtp(text, index)}
+                    onKeyPress={(event) => handleKeyPress(event, index)}
                     ref={otpRefs[index]}
                     keyboardType="numeric"
                     maxLength={1}
                     textAlign="center"
                     fontSize={20}
-                    variant="outline"
                     bg="white"
                     width="22%"
                   />

@@ -98,7 +98,6 @@ export default function Home() {
           alignItems: "center",
         }}
       >
-        <Text>hello</Text>
         <Image
           source={{
             uri: "http://172.17.58.151:9000/auth/getImage/Group 11.png",
@@ -110,7 +109,6 @@ export default function Home() {
       </View>
     );
   }
-  const [mongo, setMongo] = useState();
 
   useFocusEffect(
     useCallback(() => {
