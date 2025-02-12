@@ -72,7 +72,7 @@ export default function AddViolations() {
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.mediaTypes,
       allowsMultipleSelection: true,
       selectionLimit: 5,
       quality: 1,
