@@ -137,13 +137,13 @@ export default function QrCamera() {
         photo={!barcodeMode}
       />
       <View style={styles.overlay}>
-        <View style={styles.qrFrame}>
-          {barcodeMode && (
+        {barcodeMode && (
+          <View style={styles.qrFrame}>
             <Animated.View
               style={[styles.scanLine, { transform: [{ translateY }] }]}
             />
-          )}
-        </View>
+          </View>
+        )}
         {scannedData?.length > 0 && (
           <Text fontSize={20} color="#fff" padding={4}>
             {scannedData}
@@ -167,25 +167,30 @@ export default function QrCamera() {
           color="white"
         />
       </TouchableOpacity>
-      <View style={styles.bottomContainer}>
-        <TouchableOpacity
-          style={styles.galleryButton}
-          onPress={handlePickImages}
-        >
-          <Ionicons name="images-outline" size={30} color="white" />
-        </TouchableOpacity>
-        {!barcodeMode && (
-          <TouchableOpacity style={styles.captureButton} onPress={capturePhoto}>
-            <Ionicons name="camera-outline" size={40} color="black" />
+      {!barcodeMode && (
+        <View style={styles.bottomContainer}>
+          <TouchableOpacity
+            style={styles.galleryButton}
+            onPress={handlePickImages}
+          >
+            <Ionicons name="images-outline" size={30} color="white" />
           </TouchableOpacity>
-        )}
-        <TouchableOpacity
-          style={styles.flipButton}
-          onPress={toggleCameraFacing}
-        >
-          <Ionicons name="camera-reverse-outline" size={30} color="white" />
-        </TouchableOpacity>
-      </View>
+          {!barcodeMode && (
+            <TouchableOpacity
+              style={styles.captureButton}
+              onPress={capturePhoto}
+            >
+              <Ionicons name="camera-outline" size={40} color="black" />
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity
+            style={styles.flipButton}
+            onPress={toggleCameraFacing}
+          >
+            <Ionicons name="camera-reverse-outline" size={30} color="white" />
+          </TouchableOpacity>
+        </View>
+      )}
       <Modal visible={showImagePopup} transparent={true} animationType="slide">
         <View style={styles.popupContainer}>
           <FlatList
