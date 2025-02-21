@@ -73,7 +73,7 @@ export const fetchDataBySearchQuery = createAsyncThunk(
 );
 
 const initialState = {
-  searchStore: "2023005339",
+  searchStore: "",
   profile: null,
   cardData: [],
   cardType: "Violations",
