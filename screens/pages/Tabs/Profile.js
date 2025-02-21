@@ -6,18 +6,18 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
+import { clearState } from "../../../store/slices/homeSlice";
+import { clearProfile } from "../../../store/slices/profileSlice";
 export default function Profile() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const { profile, image } = useSelector((state) => state.profile);
   const [storedProfile, setStoredProfile] = useState(null);
   const [storedImage, setStoredImage] = useState(null);
-
   useEffect(() => {
     const loadProfileFromStorage = async () => {
       const storedUser = await AsyncStorage.getItem("authUser");
       const storedImage = await AsyncStorage.getItem("profileImage");
-
       if (!profile && storedUser) {
         setStoredProfile(JSON.parse(storedUser));
       }
@@ -27,10 +27,8 @@ export default function Profile() {
     };
     loadProfileFromStorage();
   }, [profile]);
-
   const userProfile = profile || storedProfile;
   const profileImage = image || storedImage;
-
   const studentInfo = userProfile?.stdprofile?.[0]
     ? {
         Name: userProfile.stdprofile[0].name || "N/A",
@@ -41,19 +39,22 @@ export default function Profile() {
         Campus: userProfile.stdprofile[0].campus || "N/A",
       }
     : null;
-
   const studKeys = studentInfo ? Object.keys(studentInfo) : [];
   const studValues = studentInfo ? Object.values(studentInfo) : [];
-
   const handleLogout = async () => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "Splash" }],
-    });
-    await AsyncStorage.removeItem("token");
-    await AsyncStorage.removeItem("authUser");
-    await AsyncStorage.removeItem("profileImage");
-    dispatch(clearProfile());
+    try {
+      await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("authUser");
+      await AsyncStorage.removeItem("profileImage");
+      dispatch(clearProfile());
+      dispatch(clearState());
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Splash" }],
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
   return (
     <SafeAreaProvider>

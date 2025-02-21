@@ -135,6 +135,7 @@ export default function QrCamera() {
         codeScanner={barcodeMode ? codeScanner : undefined}
         isActive={true}
         photo={!barcodeMode}
+        flash={isFlashOn ? "on" : "off"}
       />
       <View style={styles.overlay}>
         {barcodeMode && (
@@ -150,7 +151,7 @@ export default function QrCamera() {
           </Text>
         )}
       </View>
-      <TouchableOpacity style={styles.flashButton} onPress={toggleFlash}>
+      {/* <TouchableOpacity style={styles.flashButton} onPress={toggleFlash}>
         <Ionicons
           name={isFlashOn ? "flash" : "flash-off"}
           size={30}
@@ -166,7 +167,7 @@ export default function QrCamera() {
           size={30}
           color="white"
         />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       {!barcodeMode && (
         <View style={styles.bottomContainer}>
           <TouchableOpacity

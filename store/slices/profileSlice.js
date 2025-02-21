@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "../../constants/Constants";
 const fetchImageAsBase64 = async (url) => {
   try {
     const response = await fetch(url);
@@ -19,19 +20,16 @@ export const fetchProfile = createAsyncThunk(
   "profile/fetchProfile",
   async (searchStore, { rejectWithValue }) => {
     try {
-      const response = await fetch(
-        "https://studentmobileapi.gitam.edu/LoginGym",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            UserName: searchStore,
-            Password: "Ganesh@2024",
-          }),
-        }
-      );
+      const response = await fetch(Constants.LOGIN_GYM_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          UserName: searchStore,
+          Password: Constants.GET_PROFILE_PASSWORD,
+        }),
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch profile data.");
       }
@@ -115,9 +113,10 @@ const profileSlice = createSlice({
     clearProfile: (state) => {
       state.profile = null;
       state.image = null;
-      AsyncStorage.removeItem("authUser");
-      AsyncStorage.removeItem("profileImage");
+      state.searchStore = "";
+      state.deviceType = "";
     },
+
     setDeviceType: (state, action) => {
       state.deviceType = action.payload;
     },

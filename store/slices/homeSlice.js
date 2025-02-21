@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import Constants from "../../constants/Constants";
 
 const API_URLS = {
-  PROFILE: "https://studentmobileapi.gitam.edu/LoginGym",
+  PROFILE: Constants.LOGIN_GYM_API_URL,
   SEARCH: "http://172.17.58.151:9000/global/getCardsByID",
 };
 
@@ -29,7 +30,7 @@ export const fetchProfile = createAsyncThunk(
     try {
       const body = JSON.stringify({
         UserName: searchStore,
-        Password: "Ganesh@2024",
+        Password: Constants.GET_PROFILE_PASSWORD,
       });
       const options = {
         method: "POST",
@@ -72,7 +73,7 @@ export const fetchDataBySearchQuery = createAsyncThunk(
 );
 
 const initialState = {
-  searchStore: "",
+  searchStore: "2023005339",
   profile: null,
   cardData: [],
   cardType: "Violations",

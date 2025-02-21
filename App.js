@@ -19,6 +19,7 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { navigationRef, navigate } from "./navigationRef";
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -79,16 +80,25 @@ export default function App() {
   const notificationListener = useRef();
   const responseListener = useRef();
   useEffect(() => {
-    registerForPushNotificationsAsync()
-      .then((token) => setExpoPushToken(token ?? ""))
-      .catch((error) => setExpoPushToken(`${error}`));
+    async function setupPushNotifications() {
+      const token = await registerForPushNotificationsAsync();
+      if (token) {
+        setExpoPushToken(token);
+      }
+    }
+
+    setupPushNotifications();
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
         setNotification(notification);
       });
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
-        console.log(response);
+        const screen = response.notification.request.content.data?.screen;
+        const params = response.notification.request.content.data?.params || {};
+        if (screen) {
+          navigate(screen, params);
+        }
       });
     return () => {
       notificationListener.current &&
@@ -109,18 +119,14 @@ export default function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
           <NativeBaseProvider theme={CustomTheme}>
             <StatusBar style="auto" />
             <Stack.Navigator
               screenOptions={{
-                headerStyle: {
-                  backgroundColor: "#007367",
-                },
+                headerStyle: { backgroundColor: "#007367" },
                 headerTintColor: "#fff",
-                headerTitleStyle: {
-                  fontWeight: "bold",
-                },
+                headerTitleStyle: { fontWeight: "bold" },
               }}
             >
               <Stack.Screen

@@ -9,15 +9,18 @@ import {
   useToast,
   View,
 } from "native-base";
-import { Pressable, Alert } from "react-native";
+import { Pressable, Alert, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
+import { Ionicons } from "@expo/vector-icons";
+import moment from "moment";
 export default function ViolationsCard() {
   const toast = useToast();
   const { cardData, image, noProfile, profile } = useSelector(
     (state) => state.home
   );
   const { profile: SecurityProfile } = useSelector((state) => state.profile);
+  const [more, setMore] = useState(false);
   const [leaves, setLeaves] = useState(null);
   const fetchLeavePermissions = async () => {
     try {
@@ -91,7 +94,6 @@ export default function ViolationsCard() {
       return { success: false, error: error.message };
     }
   };
-
   const handleLeavePermissions = (type) => {
     Alert.alert(
       "Confirmation",
@@ -119,12 +121,10 @@ export default function ViolationsCard() {
               campus: profile?.stdprofile[0]?.campus,
               genarated_by: SecurityProfile?.userName || "security",
             };
-
             const response = await postCheckInOut(
               type,
               type === "checkin" ? checkInData : checkOutData
             );
-
             if (response.status === "success") {
               toast.show({
                 render: () => (
@@ -155,7 +155,6 @@ export default function ViolationsCard() {
       { cancelable: true }
     );
   };
-
   const CustomButton = ({
     onPress,
     iconName,
@@ -213,46 +212,87 @@ export default function ViolationsCard() {
   );
   const LeavesPermissionsStack = () => {
     const isDisabled =
-      !leaves?.getpermissionstatus || leaves.getpermissionstatus.length === 0;
-
+      !leaves?.getpermissionstatus || leaves?.getpermissionstatus?.length === 0;
+    const permissionData = leaves?.getpermissionstatus[0];
+    const permissionDate = permissionData?.fromdate
+      ? moment(permissionData.fromdate, "DD-MMM-YYYY").format("YYYY-MM-DD")
+      : null;
+    const currentDate = moment().format("YYYY-MM-DD");
+    const isDateMatched = permissionDate === currentDate;
+    const fromTime = moment(permissionData?.fromtime, "HH");
+    const toTime = moment(permissionData?.totime, "HH.mm");
+    const now = moment();
+    const canCheckIn = now.isBetween(
+      fromTime.clone().subtract(30, "minutes"),
+      toTime,
+      "minutes",
+      "[)"
+    );
+    const canCheckOut = now.isBetween(
+      fromTime,
+      toTime.clone().add(30, "minutes"),
+      "minutes",
+      "[)"
+    );
+    if (!isDateMatched) return null;
     return (
       <Box bg="#F5F5F5" borderRadius="xl" padding="4" marginTop="4">
-        <Text fontSize="lg" fontWeight="bold" color="#007367" marginBottom="4">
-          Leaves & Permissions ({leaves?.getpermissionstatus?.length || 0})
-        </Text>
+        <VStack
+          flex={1}
+          flexDirection={"row"}
+          justifyContent={"space-between"}
+          alignItems={"center"}
+        >
+          <Text
+            fontSize="lg"
+            fontWeight="bold"
+            color="#007367"
+            marginBottom="4"
+          >
+            Permissions ({leaves?.getpermissionstatus?.length || 0})
+          </Text>
+          <Text
+            fontSize="sm"
+            fontWeight="bold"
+            color="gray.500"
+            marginBottom="3"
+          >
+            {permissionData?.fromdate} | {permissionData?.fromtime} -{" "}
+            {permissionData?.totime}
+          </Text>
+        </VStack>
         <HStack justifyContent="space-between" space={4}>
           <CustomButton
             text="Check In"
             bgColor={
-              isDisabled || leaves?.getpermissionstatus[0]?.isapprove === "I"
+              isDisabled || !canCheckIn || permissionData?.isapprove === "I"
                 ? "#fff"
                 : "#007367"
             }
             textColor={
-              isDisabled || leaves?.getpermissionstatus[0]?.isapprove === "I"
+              isDisabled || !canCheckIn || permissionData?.isapprove === "I"
                 ? "black"
                 : "#fff"
             }
-            borderColor="#37474F"
             status={
-              isDisabled || leaves?.getpermissionstatus[0]?.isapprove === "I"
+              isDisabled || !canCheckIn || permissionData?.isapprove === "I"
             }
             onPress={() => handleLeavePermissions("checkin")}
           />
           <CustomButton
             text="Check Out"
             bgColor={
-              isDisabled || leaves?.getpermissionstatus[0]?.isapprove === "L"
+              isDisabled || !canCheckOut || permissionData?.isapprove === "L"
                 ? "#fff"
                 : "#007367"
             }
             textColor={
-              isDisabled || leaves?.getpermissionstatus[0]?.isapprove === "L"
+              isDisabled || !canCheckOut || permissionData?.isapprove === "L"
                 ? "black"
                 : "#fff"
             }
             status={
-              isDisabled || leaves?.getpermissionstatus[0]?.isapprove === "L"
+              isDisabled || !canCheckOut || permissionData?.isapprove === "L"
             }
             onPress={() => handleLeavePermissions("checkout")}
           />
@@ -260,7 +300,6 @@ export default function ViolationsCard() {
       </Box>
     );
   };
-
   return (
     <Box padding="6" shadow="9" bg="#fff" borderRadius="xl">
       <HStack space="lg">
@@ -270,19 +309,28 @@ export default function ViolationsCard() {
           size="lg"
           borderRadius="xl"
         />
-        <VStack space="2" flex={1}>
-          <Text
-            color="#007367"
-            fontWeight="bold"
-            fontSize="lg"
+        <VStack space="0.5" flex={1}>
+          <Text color="#007367" fontWeight="bold" fontSize="lg" flexWrap="wrap">
+            {profile?.stdprofile?.[0]?.name || "N/A"}
+          </Text>
+          <HStack
+            justifyContent="space-between"
+            alignItems="center"
+            space={1}
             flexWrap="wrap"
-            flex={1}
           >
-            {profile?.stdprofile?.[0]?.name || "Name not available"}
-          </Text>
-          <Text fontWeight="semibold" fontSize="md">
-            {profile?.role || "Role not available"}
-          </Text>
+            <Text fontWeight="semibold" fontSize="md">
+              {profile?.role || "N/A"}{" "}
+              {profile?.stdprofile?.[0]?.hostler === "Y" && (
+                <>
+                  -{" "}
+                  <Text fontWeight="bold" fontSize="lg" color="green.500">
+                    H
+                  </Text>
+                </>
+              )}
+            </Text>
+          </HStack>
           <HStack
             justifyContent="space-between"
             alignItems="center"
@@ -290,7 +338,7 @@ export default function ViolationsCard() {
             flexWrap="wrap"
           >
             <Text fontWeight="semibold" fontSize="md">
-              {profile?.stdprofile?.[0]?.regdno || "Not available"}
+              {profile?.stdprofile?.[0]?.regdno || "N/A"}
             </Text>
             <Badge
               colorScheme={
@@ -314,45 +362,64 @@ export default function ViolationsCard() {
           </HStack>
         </VStack>
       </HStack>
-      <VStack space={1.5} marginTop="6">
-        {[
-          { key: "Batch", value: profile?.stdprofile?.[0]?.batch },
-          { key: "Department", value: profile?.stdprofile?.[0]?.branch_code },
-          { key: "Campus", value: profile?.stdprofile?.[0]?.campus },
-          { key: "Email", value: profile?.stdprofile?.[0]?.emailid },
-          { key: "Mobile", value: profile?.stdprofile?.[0]?.mobile },
-        ].map((item, index) => (
-          <Box
-            key={index}
-            flexDirection="row"
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <Text fontSize="md" fontWeight={"bold"}>
-              {item.key}
-            </Text>
-            <Text
-              fontSize="md"
-              color={
-                item.key === "Role"
-                  ? "#007367"
-                  : item.key === "Name"
-                  ? "#000000"
-                  : "#706F6F"
-              }
-              paddingLeft={4}
-            >
-              {item?.value || "Not available"}
-            </Text>
-          </Box>
-        ))}
+      <VStack
+        flex={1}
+        mt={2}
+        alignItems="center"
+        justifyContent="center"
+        pointerEvents="auto"
+      >
+        <TouchableOpacity onPress={() => setMore((prev) => !prev)}>
+          <Text color={"green.600"} fontSize={14} fontWeight={"bold"}>
+            Show {more ? "less" : "more"}
+          </Text>
+        </TouchableOpacity>
       </VStack>
+      {more && (
+        <VStack space={1.5} marginTop="6">
+          {[
+            { key: "Batch", value: profile?.stdprofile?.[0]?.batch },
+            { key: "Department", value: profile?.stdprofile?.[0]?.branch_code },
+            { key: "Campus", value: profile?.stdprofile?.[0]?.campus },
+            { key: "Email", value: profile?.stdprofile?.[0]?.emailid },
+            { key: "Mobile", value: profile?.stdprofile?.[0]?.mobile },
+          ].map((item, index) => (
+            <Box
+              key={index}
+              flexDirection="row"
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <Text fontSize="md" fontWeight={"bold"}>
+                {item.key}
+              </Text>
+              <Text
+                fontSize="md"
+                color={
+                  item.key === "Role"
+                    ? "#007367"
+                    : item.key === "Name"
+                    ? "#000000"
+                    : "#706F6F"
+                }
+                paddingLeft={4}
+              >
+                {item?.value || "N/A"}
+              </Text>
+            </Box>
+          ))}
+        </VStack>
+      )}
+      {profile?.role === "student" &&
+        profile?.stdprofile[0]?.hostler === "Y" &&
+        leaves?.getpermissionstatus?.length !== 0 &&
+        moment(leaves?.getpermissionstatus[0]?.fromdate, "DD-MMM-YYYY").format(
+          "YYYY-MM-DD"
+        ) === moment().format("YYYY-MM-DD") && <LeavesPermissionsStack />}
       <ViolationsStack
         cardData={cardData}
         handleShowViolations={handleShowViolations}
       />
-      {profile?.role === "student" &&
-        profile?.stdprofile[0]?.hostler === "Y" && <LeavesPermissionsStack />}
     </Box>
   );
 }

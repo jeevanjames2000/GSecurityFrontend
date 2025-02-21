@@ -140,6 +140,7 @@ export default function Communication({ navigation }) {
             pushTokens,
             title: "Communication Alert",
             body: message,
+            data: { screen: "Communication", params: { messageId: "12345" } },
           }),
         });
       } catch (error) {
@@ -201,7 +202,7 @@ export default function Communication({ navigation }) {
         <HStack justifyContent="space-between">
           <HStack space={2}>
             <Text fontWeight="bold">{msg?.username || "Anonymous"}</Text>
-            <Text color="gray.500">+91 {msg?.mobile || "N/A"}</Text>
+            {/* <Text color="gray.500">+91 {msg?.mobile || "N/A"}</Text> */}
           </HStack>
         </HStack>
         <Text mt="2" fontSize="md">
@@ -277,7 +278,7 @@ export default function Communication({ navigation }) {
               borderRadius="10"
               borderWidth={1}
               borderColor="rgba(0, 0, 0, 0.1)"
-              shadow={2}
+              // shadow={2}
               bg={"#F8FAFC"}
               mb={0.5}
               mt={0.5}
@@ -285,7 +286,7 @@ export default function Communication({ navigation }) {
               <Text
                 color="black"
                 fontWeight="thin"
-                fontSize={14}
+                fontSize={10}
                 textAlign="center"
               >
                 {dateLabel}

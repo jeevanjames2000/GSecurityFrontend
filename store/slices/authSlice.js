@@ -1,21 +1,19 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import Constants from "../../constants/Constants";
 export const fetchProfile = createAsyncThunk(
   "auth/fetchProfile",
   async (searchStore, { rejectWithValue }) => {
     try {
-      const response = await fetch(
-        "https://studentmobileapi.gitam.edu/LoginGym",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            UserName: searchStore,
-            Password: "Ganesh@2024",
-          }),
-        }
-      );
+      const response = await fetch(Constants.LOGIN_GYM_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          UserName: searchStore,
+          Password: Constants.GET_PROFILE_PASSWORD,
+        }),
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch profile data.");
       }
