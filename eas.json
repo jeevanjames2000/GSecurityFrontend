@@ -4,6 +4,11 @@
     "appVersionSource": "remote"
   },
   "build": {
+    "android": {
+      "env": {
+        "GOOGLE_SERVICES_JSON": "/google-services.json"
+      }
+    },
     "development": {
       "developmentClient": true,
       "distribution": "internal"
@@ -11,6 +16,9 @@
     "preview": {
       "distribution": "internal",
       "android": {
+        "env": {
+          "GOOGLE_SERVICES_JSON": "/google-services.json"
+        },
         "buildType": "apk"
       }
     },

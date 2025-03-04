@@ -16,6 +16,7 @@ import {
 } from "native-base";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import Constants from "../../../constants/Constants";
 export default function AddGatepass() {
   const toast = useToast();
   const navigation = useNavigation();
@@ -62,7 +63,7 @@ export default function AddGatepass() {
       particulars: particulars,
     };
     const response = await fetch(
-      "http://172.17.58.151:9000/gatepass/createGatePass",
+      `${Constants.GSecurity_NGROK_API_URL}/gatepass/createGatePass`,
       {
         method: "POST",
         headers: {

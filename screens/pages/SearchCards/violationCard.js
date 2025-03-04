@@ -12,7 +12,6 @@ import {
 import { Pressable, Alert, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useSelector } from "react-redux";
-import { Ionicons } from "@expo/vector-icons";
 import moment from "moment";
 export default function ViolationsCard() {
   const toast = useToast();
@@ -50,7 +49,7 @@ export default function ViolationsCard() {
       >
         <Image
           source={{
-            uri: "http://172.17.58.151:9000/auth/getImage/Group 11.png",
+            uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/Group 11.png`,
           }}
           alt="No Results icon"
           style={{ width: 200, height: 200 }}
@@ -410,12 +409,13 @@ export default function ViolationsCard() {
           ))}
         </VStack>
       )}
-      {profile?.role === "student" &&
+      {/* {profile?.role === "student" &&
         profile?.stdprofile[0]?.hostler === "Y" &&
         leaves?.getpermissionstatus?.length !== 0 &&
         moment(leaves?.getpermissionstatus[0]?.fromdate, "DD-MMM-YYYY").format(
           "YYYY-MM-DD"
-        ) === moment().format("YYYY-MM-DD") && <LeavesPermissionsStack />}
+        ) === moment().format("YYYY-MM-DD") && <LeavesPermissionsStack />} */}
+      <LeavesPermissionsStack />
       <ViolationsStack
         cardData={cardData}
         handleShowViolations={handleShowViolations}

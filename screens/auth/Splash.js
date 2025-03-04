@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { View, Image, Spinner, useToast, Box, Text } from "native-base";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "../../constants/Constants";
 export default function SplashScreen({ navigation, route }) {
   const [expired, setExpired] = useState(false);
   const toast = useToast();
@@ -67,7 +68,7 @@ export default function SplashScreen({ navigation, route }) {
     >
       <Image
         source={{
-          uri: "http://172.17.58.151:9000/auth/getImage/gitam-logo-circle.png",
+          uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/gitam-logo-circle.png`,
         }}
         alt="Gitam-Logo"
         style={{

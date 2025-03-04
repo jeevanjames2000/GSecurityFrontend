@@ -8,6 +8,7 @@ import {
   Text,
   Center,
 } from "native-base";
+import Constants from "../../../constants/Constants";
 
 export default function LeavesAndPermissionsCard() {
   const profileData = [
@@ -40,7 +41,7 @@ export default function LeavesAndPermissionsCard() {
         <HStack space={"lg"}>
           <Image
             source={{
-              uri: "http://172.17.58.151:9000/auth/getImage/progfile_sec.jpg",
+              uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/progfile_sec.jpg`,
             }}
             alt="Profile Image"
             size="lg"

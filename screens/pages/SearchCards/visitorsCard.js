@@ -27,7 +27,7 @@ export default function VisitorDetailsCard() {
       >
         <Image
           source={{
-            uri: "http://172.17.58.151:9000/auth/getImage/Group 11.png",
+            uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/Group 11.png`,
           }}
           alt="No Results icon"
           style={{ width: 200, height: 200 }}
@@ -52,7 +52,7 @@ export default function VisitorDetailsCard() {
 
     try {
       const response = await fetch(
-        "http://172.17.58.151:9000/auth/updateVisitors",
+        `${Constants.GSecurity_NGROK_API_URL}/auth/updateVisitors`,
         {
           method: "POST",
           headers: {

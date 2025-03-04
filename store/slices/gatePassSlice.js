@@ -6,7 +6,9 @@ export const fetchGatepassByID = createAsyncThunk(
       const queryParams = new URLSearchParams();
       if (searchQuery) queryParams.append("searchQuery", searchQuery);
       const response = await fetch(
-        `http://172.17.58.151:9000/gatepass/getGatepassByID?${queryParams.toString()}`
+        `${
+          Constants.GSecurity_NGROK_API_URL
+        }/gatepass/getGatepassByID?${queryParams.toString()}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch gate pass by search query.");

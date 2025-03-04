@@ -20,7 +20,7 @@
       }
     },
     "android": {
-      "googleServicesFile": "./google-services.json",
+      "googleServicesFile": "./android/app/google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/gitam-logo-circle.png",
         "backgroundColor": "#ffffff"

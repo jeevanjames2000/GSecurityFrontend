@@ -7,18 +7,19 @@ import Profile from "./Tabs/Profile";
 import MainNavigator from "./MainNavigator";
 import { Image } from "native-base";
 import QrCamera from "./Tabs/Camera";
+import Constants from "../../constants/Constants";
 const Tab = createBottomTabNavigator();
 export default function Main({ route }) {
   const navigation = useNavigation();
   const icons = {
     MainNavigator: {
-      uri: "http://172.17.58.151:9000/auth/getImage/home.png",
+      uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/home.png`,
     },
     QR: {
-      uri: "http://172.17.58.151:9000/auth/getImage/qr-code1.png",
+      uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/qr-code1.png`,
     },
     Profile: {
-      uri: "http://172.17.58.151:9000/auth/getImage/user1.png",
+      uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/user1.png`,
     },
   };
 

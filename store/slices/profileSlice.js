@@ -71,7 +71,7 @@ export const sendPushTokenToServer = createAsyncThunk(
     }
 
     try {
-      const apiUrl = "http://172.17.58.151:9000/auth/expoPushtoken";
+      const apiUrl = `${Constants.GSecurity_NGROK_API_URL}/auth/expoPushtoken`;
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {

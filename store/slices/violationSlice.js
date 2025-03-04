@@ -5,7 +5,7 @@ export const fetchViolations = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        "http://172.17.58.151:9000/auth/getViolations"
+        `${Constants.GSecurity_NGROK_API_URL}/auth/getViolations`
       );
       const data = await response.json();
       return data;

@@ -17,6 +17,7 @@ import {
 import { TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useNavigation } from "@react-navigation/native";
+import Constants from "../../../constants/Constants";
 const Violations = () => {
   const navigation = useNavigation();
   const { isOpen, onOpen, onClose } = useDisclose();
@@ -199,7 +200,7 @@ const Violations = () => {
           <Pressable>
             <Image
               source={{
-                uri: "http://172.17.58.151:9000/auth/getImage/search.png",
+                uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/search.png`,
               }}
               alt="Search Icon"
               size={8}

@@ -34,6 +34,7 @@ import { setRefresh } from "../../../store/slices/violationSlice";
 import { fetchDataBySearchQuery } from "../../../store/slices/homeSlice";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "../../../constants/Constants";
 export default function AddViolations() {
   const { refresh } = useSelector((state) => state.violations);
   const { cardData, cardType, searchStore, profile } = useSelector(
@@ -235,7 +236,7 @@ export default function AddViolations() {
     formData.append("regdNo_empId", profile?.stdprofile?.[0]?.regdno);
     try {
       const response = await fetch(
-        "http://172.17.58.151:9000/auth/reportViolation",
+        `${Constants.GSecurity_NGROK_API_URL}/auth/reportViolation`,
         {
           method: "POST",
           body: formData,

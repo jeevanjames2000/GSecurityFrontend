@@ -11,7 +11,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { logErrorToDB } from "../../store/slices/loggerSlice";
+import Constants from "../../constants/Constants";
+
 export default function Communication({ navigation }) {
   const dispatch = useDispatch();
   const [message, setMessage] = useState("");
@@ -31,7 +32,7 @@ export default function Communication({ navigation }) {
   const fetchMessages = async () => {
     try {
       const response = await fetch(
-        "http://172.17.58.151:9000/auth/getAllMessages"
+        `${Constants.GSecurity_NGROK_API_URL}/auth/getAllMessages`
       );
       const data = await response.json();
       if (data.success) {
@@ -47,7 +48,7 @@ export default function Communication({ navigation }) {
         deviceType: deviceType,
       };
 
-      dispatch(logErrorToDB(errorDetails));
+      // dispatch(logErrorToDB(errorDetails));
     }
   };
   const fetchUser = async () => {
@@ -76,7 +77,7 @@ export default function Communication({ navigation }) {
         deviceType: deviceType,
       };
 
-      dispatch(logErrorToDB(errorDetails));
+      // dispatch(logErrorToDB(errorDetails));
     }
   };
   const scrollViewRef = useRef(null);
@@ -104,7 +105,7 @@ export default function Communication({ navigation }) {
       setMessage("");
       try {
         const saveResponse = await fetch(
-          "http://172.17.58.151:9000/auth/communications",
+          `${Constants.GSecurity_NGROK_API_URL}/auth/communications`,
           {
             method: "POST",
             headers: {
@@ -119,7 +120,7 @@ export default function Communication({ navigation }) {
           return;
         }
         const tokenResponse = await fetch(
-          `http://172.17.58.151:9000/auth/getAllPushTokens/${profile?.stdprofile[0]?.regdno}`
+          `${Constants.GSecurity_NGROK_API_URL}/auth/getAllPushTokens/${profile?.stdprofile[0]?.regdno}`
         );
         const tokenData = await tokenResponse.json();
         if (
@@ -131,18 +132,21 @@ export default function Communication({ navigation }) {
           return;
         }
         const pushTokens = tokenData.pushTokens;
-        await fetch("http://172.17.58.151:9000/auth/expoPushNotification", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            pushTokens,
-            title: "Communication Alert",
-            body: message,
-            data: { screen: "Communication", params: { messageId: "12345" } },
-          }),
-        });
+        await fetch(
+          `${Constants.GSecurity_NGROK_API_URL}/auth/expoPushNotification`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              pushTokens,
+              title: "Communication Alert",
+              body: message,
+              data: { screen: "Communication", params: { messageId: "12345" } },
+            }),
+          }
+        );
       } catch (error) {
         const errorDetails = {
           errorLevel: "error",
@@ -152,7 +156,7 @@ export default function Communication({ navigation }) {
           errorLocation: "Communications",
           deviceType: deviceType,
         };
-        dispatch(logErrorToDB(errorDetails));
+        // dispatch(logErrorToDB(errorDetails));
       }
     }
   }, [message, profile]);

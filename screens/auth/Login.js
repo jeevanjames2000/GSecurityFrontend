@@ -22,6 +22,7 @@ import {
   sendPushTokenToServer,
 } from "../../store/slices/profileSlice";
 import { fetchProfile as AuthProfile } from "../../store/slices/authSlice";
+import Constants from "../../constants/Constants";
 export default function Login({ navigation }) {
   const OTP_LENGTH = 4;
   const toast = useToast();
@@ -47,7 +48,7 @@ export default function Login({ navigation }) {
     setError(null);
     try {
       const response = await fetch(
-        "http://172.17.58.151:9000/auth/generateAndStoreOtp",
+        `${Constants.GSecurity_NGROK_API_URL}/auth/generateAndStoreOtp`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -101,7 +102,7 @@ export default function Login({ navigation }) {
     setError(null);
     try {
       const response = await fetch(
-        "http://172.17.58.151:9000/auth/loginWithOtp",
+        `${Constants.GSecurity_NGROK_API_URL}/auth/loginWithOtp`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -156,7 +157,7 @@ export default function Login({ navigation }) {
           >
             <Image
               source={{
-                uri: "http://172.17.58.151:9000/auth/getImage/GitamLogo.jpg",
+                uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/GitamLogo.jpg`,
               }}
               alt="Search Icon"
               style={{ height: 200, width: 200 }}
@@ -173,7 +174,7 @@ export default function Login({ navigation }) {
           >
             <Image
               source={{
-                uri: "http://172.17.58.151:9000/auth/getImage/Frame1.png",
+                uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/Frame1.png`,
               }}
               alt="Illustration"
               resizeMode="contain"
