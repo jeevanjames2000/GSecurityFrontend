@@ -32,7 +32,7 @@ export default function Communication({ navigation }) {
   const fetchMessages = async () => {
     try {
       const response = await fetch(
-        `${Constants.GSecurity_NGROK_API_URL}/auth/getAllMessages`
+        `${Constants.GSecurity_API_URL}/auth/getAllMessages`
       );
       const data = await response.json();
       if (data.success) {
@@ -105,7 +105,7 @@ export default function Communication({ navigation }) {
       setMessage("");
       try {
         const saveResponse = await fetch(
-          `${Constants.GSecurity_NGROK_API_URL}/auth/communications`,
+          `${Constants.GSecurity_API_URL}/auth/communications`,
           {
             method: "POST",
             headers: {
@@ -120,7 +120,7 @@ export default function Communication({ navigation }) {
           return;
         }
         const tokenResponse = await fetch(
-          `${Constants.GSecurity_NGROK_API_URL}/auth/getAllPushTokens/${profile?.stdprofile[0]?.regdno}`
+          `${Constants.GSecurity_API_URL}/auth/getAllPushTokens/${profile?.stdprofile[0]?.regdno}`
         );
         const tokenData = await tokenResponse.json();
         if (
@@ -133,7 +133,7 @@ export default function Communication({ navigation }) {
         }
         const pushTokens = tokenData.pushTokens;
         await fetch(
-          `${Constants.GSecurity_NGROK_API_URL}/auth/expoPushNotification`,
+          `${Constants.GSecurity_API_URL}/auth/expoPushNotification`,
           {
             method: "POST",
             headers: {

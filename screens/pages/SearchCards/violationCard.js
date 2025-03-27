@@ -23,6 +23,7 @@ export default function ViolationsCard() {
   const [leaves, setLeaves] = useState(null);
   const fetchLeavePermissions = async () => {
     try {
+      console.log(`Bearer ${profile.token}`);
       const url = `https://studentmobileapi.gitam.edu/Gsecurity_permissionstatus?regdno=${profile.stdprofile[0].regdno}`;
       const response = await fetch(url, {
         method: "GET",
@@ -49,7 +50,7 @@ export default function ViolationsCard() {
       >
         <Image
           source={{
-            uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/Group 11.png`,
+            uri: `${Constants.GSecurity_API_URL}/auth/getImage/Group 11.png`,
           }}
           alt="No Results icon"
           style={{ width: 200, height: 200 }}
@@ -264,17 +265,26 @@ export default function ViolationsCard() {
           <CustomButton
             text="Check In"
             bgColor={
-              isDisabled || !canCheckIn || permissionData?.isapprove === "I"
+              isDisabled ||
+              !canCheckIn ||
+              permissionData?.isapprove === "I" ||
+              permissionData?.isapprove === "Y"
                 ? "#fff"
                 : "#007367"
             }
             textColor={
-              isDisabled || !canCheckIn || permissionData?.isapprove === "I"
+              isDisabled ||
+              !canCheckIn ||
+              permissionData?.isapprove === "I" ||
+              permissionData?.isapprove === "Y"
                 ? "black"
                 : "#fff"
             }
             status={
-              isDisabled || !canCheckIn || permissionData?.isapprove === "I"
+              isDisabled ||
+              !canCheckIn ||
+              permissionData?.isapprove === "I" ||
+              permissionData?.isapprove === "Y"
             }
             onPress={() => handleLeavePermissions("checkin")}
           />
@@ -409,13 +419,17 @@ export default function ViolationsCard() {
           ))}
         </VStack>
       )}
-      {/* {profile?.role === "student" &&
+
+      {profile?.role === "student" &&
         profile?.stdprofile[0]?.hostler === "Y" &&
         leaves?.getpermissionstatus?.length !== 0 &&
         moment(leaves?.getpermissionstatus[0]?.fromdate, "DD-MMM-YYYY").format(
           "YYYY-MM-DD"
-        ) === moment().format("YYYY-MM-DD") && <LeavesPermissionsStack />} */}
-      <LeavesPermissionsStack />
+        ) === moment().format("YYYY-MM-DD") &&
+        leaves?.getpermissionstatus[0]?.isapprove != "I" && (
+          <LeavesPermissionsStack />
+        )}
+
       <ViolationsStack
         cardData={cardData}
         handleShowViolations={handleShowViolations}

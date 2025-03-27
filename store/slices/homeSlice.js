@@ -3,7 +3,7 @@ import Constants from "../../constants/Constants";
 
 const API_URLS = {
   PROFILE: Constants.LOGIN_GYM_API_URL,
-  SEARCH: `${Constants.GSecurity_NGROK_API_URL}/global/getCardsByID`,
+  SEARCH: `${Constants.GSecurity_API_URL}/global/getCardsByID`,
 };
 
 const DEFAULT_ERROR_MESSAGE = "An error occurred while fetching data.";

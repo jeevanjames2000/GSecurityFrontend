@@ -27,13 +27,13 @@ const featuredData = [
   {
     name: "CCTV",
     img: {
-      uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/cctvnew.png`,
+      uri: `${Constants.GSecurity_API_URL}/auth/getImage/cctvnew.png`,
     },
   },
   {
     name: "Communication",
     img: {
-      uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/aggressive (1).png`,
+      uri: `${Constants.GSecurity_API_URL}/auth/getImage/aggressive (1).png`,
     },
   },
 ];
@@ -41,28 +41,28 @@ const emergencyData = [
   {
     name: "Ambulance",
     img: {
-      uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/ambulance.png`,
+      uri: `${Constants.GSecurity_API_URL}/auth/getImage/ambulance.png`,
     },
     phone: "108",
   },
   {
     name: "Disha",
     img: {
-      uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/dishaimg.png`,
+      uri: `${Constants.GSecurity_API_URL}/auth/getImage/dishaimg.png`,
     },
     phone: "181",
   },
   {
     name: "Fire",
     img: {
-      uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/firenew.png`,
+      uri: `${Constants.GSecurity_API_URL}/auth/getImage/firenew.png`,
     },
     phone: "104",
   },
   {
     name: "Police",
     img: {
-      uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/policenew.png`,
+      uri: `${Constants.GSecurity_API_URL}/auth/getImage/policenew.png`,
     },
     phone: "100",
   },
@@ -105,7 +105,7 @@ export default function Home() {
       >
         <Image
           source={{
-            uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/Group 11.png`,
+            uri: `${Constants.GSecurity_API_URL}/auth/getImage/Group 11.png`,
           }}
           alt="No Results icon"
           style={{ width: 200, height: 200 }}
@@ -168,7 +168,7 @@ export default function Home() {
           >
             <Image
               source={{
-                uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/Group 11.png`,
+                uri: `${Constants.GSecurity_API_URL}/auth/getImage/Group 11.png`,
               }}
               alt="No Results icon"
               style={{ width: 200, height: 200 }}

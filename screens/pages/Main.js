@@ -13,13 +13,13 @@ export default function Main({ route }) {
   const navigation = useNavigation();
   const icons = {
     MainNavigator: {
-      uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/home.png`,
+      uri: `${Constants.GSecurity_API_URL}/auth/getImage/home.png`,
     },
     QR: {
-      uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/qr-code1.png`,
+      uri: `${Constants.GSecurity_API_URL}/auth/getImage/qr-code1.png`,
     },
     Profile: {
-      uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/user1.png`,
+      uri: `${Constants.GSecurity_API_URL}/auth/getImage/user1.png`,
     },
   };
 

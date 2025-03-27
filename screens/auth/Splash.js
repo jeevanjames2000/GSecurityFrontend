@@ -68,7 +68,7 @@ export default function SplashScreen({ navigation, route }) {
     >
       <Image
         source={{
-          uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/gitam-logo-circle.png`,
+          uri: `${Constants.GSecurity_API_URL}/auth/getImage/gitam-logo-circle.png`,
         }}
         alt="Gitam-Logo"
         style={{

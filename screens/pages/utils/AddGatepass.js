@@ -63,7 +63,7 @@ export default function AddGatepass() {
       particulars: particulars,
     };
     const response = await fetch(
-      `${Constants.GSecurity_NGROK_API_URL}/gatepass/createGatePass`,
+      `${Constants.GSecurity_API_URL}/gatepass/createGatePass`,
       {
         method: "POST",
         headers: {

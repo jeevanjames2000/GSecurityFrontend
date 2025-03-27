@@ -236,7 +236,7 @@ export default function AddViolations() {
     formData.append("regdNo_empId", profile?.stdprofile?.[0]?.regdno);
     try {
       const response = await fetch(
-        `${Constants.GSecurity_NGROK_API_URL}/auth/reportViolation`,
+        `${Constants.GSecurity_API_URL}/auth/reportViolation`,
         {
           method: "POST",
           body: formData,

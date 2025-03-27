@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import Constants from "../../constants/Constants";
-const API_URL = `${Constants.GSecurity_NGROK_API_URL}/auth/logger`;
+const API_URL = `${Constants.GSecurity_API_URL}/auth/logger`;
 export const logErrorToDB = createAsyncThunk(
   "logger/logErrorToDB",
   async (errorDetails, { rejectWithValue }) => {

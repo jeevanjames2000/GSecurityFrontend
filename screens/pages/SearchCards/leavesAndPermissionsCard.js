@@ -41,7 +41,7 @@ export default function LeavesAndPermissionsCard() {
         <HStack space={"lg"}>
           <Image
             source={{
-              uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/progfile_sec.jpg`,
+              uri: `${Constants.GSecurity_API_URL}/auth/getImage/progfile_sec.jpg`,
             }}
             alt="Profile Image"
             size="lg"

@@ -7,7 +7,7 @@ export const fetchGatepassByID = createAsyncThunk(
       if (searchQuery) queryParams.append("searchQuery", searchQuery);
       const response = await fetch(
         `${
-          Constants.GSecurity_NGROK_API_URL
+          Constants.GSecurity_API_URL
         }/gatepass/getGatepassByID?${queryParams.toString()}`
       );
       if (!response.ok) {

@@ -200,7 +200,7 @@ const Violations = () => {
           <Pressable>
             <Image
               source={{
-                uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/search.png`,
+                uri: `${Constants.GSecurity_API_URL}/auth/getImage/search.png`,
               }}
               alt="Search Icon"
               size={8}

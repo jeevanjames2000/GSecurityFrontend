@@ -40,7 +40,7 @@ const GatepassCard = React.memo(() => {
         verified_by: parsedStoredUser.stdprofile[0].name,
       };
       const response = await fetch(
-        `${Constants.GSecurity_NGROK_API_URL}/gatepass/updateParticulars`,
+        `${Constants.GSecurity_API_URL}/gatepass/updateParticulars`,
         {
           method: "POST",
           headers: {
@@ -124,7 +124,7 @@ const GatepassCard = React.memo(() => {
       >
         <Image
           source={{
-            uri: `${Constants.GSecurity_NGROK_API_URL}/auth/getImage/Group 11.png`,
+            uri: `${Constants.GSecurity_API_URL}/auth/getImage/Group 11.png`,
           }}
           alt="No Results icon"
           style={{ width: 200, height: 200 }}
